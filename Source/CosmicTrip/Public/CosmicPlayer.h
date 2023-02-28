@@ -25,5 +25,18 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+// 
+// 	//마우스 입력처리
+// 	UPROPERTY(EditDefaltsOnly, Category = "Input")
+// 	class UInputAction* IA_Mouse;
+// 
+// 	//회전처리 함수
+// 	void Turn(const FInputActionValue& Values);
+
+protected:
+	 //카메라
+	UPROPERTY(VisibleAnywhere, Category = "VRCamera")
+	class UCameraComponent* VRCamera;
+
 
 };
