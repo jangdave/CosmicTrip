@@ -2,7 +2,9 @@
 
 
 #include "CosmicPlayer.h"
-#include "Camera/CameraComponent.h"
+#include <Camera/CameraComponent.h>
+#include "Engine/LocalPlayer.h"
+#include "EnhancedInputComponent.h"
 
 // Sets default values
 ACosmicPlayer::ACosmicPlayer()
@@ -11,6 +13,8 @@ ACosmicPlayer::ACosmicPlayer()
 	PrimaryActorTick.bCanEverTick = true;
 
 	VRCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("VRCamera"));
+	VRCamera->SetupAttachment(RootComponent);
+	VRCamera->bUsePawnControlRotation = true;
 
 }
 
@@ -18,7 +22,21 @@ ACosmicPlayer::ACosmicPlayer()
 void ACosmicPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+// 	//Enhanced Input 사용처리
+// 	auto PC = Cast<APlayerController>(GetWorld()->GetFirstLocalPlayerFromController());
+// 
+// 	if (PC)
+// 	{
+// 		//Local player
+// 		auto localPlayer = PC->GetLocalPlayer();
+// 		auto subSystem = ULocalPlayer::GetSubsystem < UEnhancedInputLocalPlayerSubsystem(localPlayer);
+// 		if (subSystem)
+// 		{
+// 			subSystem->AddMappingContext(IMC_VRInput, 0);
+// 		}
+// 	}
+// 	
 }
 
 // Called every frame
@@ -33,5 +51,18 @@ void ACosmicPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	auto InputSystem = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+	if (InputSystem)
+	{
+		//Binding
+		InputSystem->BindAction(IA_Mouse, ETriggerEvent::Triggered, this, &ACosmicPlayer::Turn);
+	}
+
 }
 
+void ACosmicPlayer::Turn(const FInputActionValue& Values)
+{
+	FVector2D Axis = Values.Get<FVector2D>();
+	AddControllerYawInput(Axis.X);
+	AddControllerPitchInput(Axis.Y);
+}

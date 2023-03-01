@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "InputActionValue.h"
 #include "CosmicPlayer.generated.h"
 
 UCLASS()
@@ -25,13 +26,18 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-// 
-// 	//마우스 입력처리
-// 	UPROPERTY(EditDefaltsOnly, Category = "Input")
-// 	class UInputAction* IA_Mouse;
-// 
-// 	//회전처리 함수
-// 	void Turn(const FInputActionValue& Values);
+
+	//Input Mapping context
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputMappingContext* IMC_VRInput;
+
+
+	//마우스 입력처리
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Mouse;
+
+	//회전처리 함수
+	void Turn(const FInputActionValue& Values);
 
 protected:
 	 //카메라
