@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Robot.generated.h"
+#include "Money.generated.h"
 
 UCLASS()
-class COSMICTRIP_API ARobot : public AActor
+class COSMICTRIP_API AMoney : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ARobot();
+	AMoney();
 
 protected:
 	// Called when the game starts or when spawned

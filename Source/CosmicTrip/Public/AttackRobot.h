@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Robot.h"
-#include "FightRobot.generated.h"
+#include "AttackRobot.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class COSMICTRIP_API AFightRobot : public ARobot
+class COSMICTRIP_API AAttackRobot : public ARobot
 {
 	GENERATED_BODY()
 	
