@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "InputActionValue.h"
 #include "CosmicPlayer.generated.h"
+
 
 UCLASS()
 class COSMICTRIP_API ACosmicPlayer : public ACharacter
@@ -25,16 +27,32 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-// 
-// 	//마우스 입력처리
-// 	UPROPERTY(EditDefaltsOnly, Category = "Input")
-// 	class UInputAction* IA_Mouse;
-// 
-// 	//회전처리 함수
-// 	void Turn(const FInputActionValue& Values);
+
+	//필요속성: 이동속도, 입력액션, 입력매핑 컨텍스트
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	float MoveSpeed = 500.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputMappingContext* IMC_VRInput;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Move;
+
+	//사용할 이동처리함수
+	void Move(const FInputActionValue& Values);
+
+	//마우스 입력처리
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Mouse;
+
+	//회전처리 함수
+	void Turn(const FInputActionValue& Values);
+
 
 protected:
-	 //카메라
+	
+		 //카메라
 	UPROPERTY(VisibleAnywhere, Category = "VRCamera")
 	class UCameraComponent* VRCamera;
 
