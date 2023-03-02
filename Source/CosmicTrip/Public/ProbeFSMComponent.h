@@ -6,6 +6,15 @@
 #include "Components/ActorComponent.h"
 #include "ProbeFSMComponent.generated.h"
 
+UENUM(BlueprintType)
+enum class EProbeState : uint8
+{
+	IDLE,
+	MOVEMONEY,
+	COLLECT,
+	MOVEHOME,
+	DIE,
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class COSMICTRIP_API UProbeFSMComponent : public UActorComponent
@@ -24,5 +33,28 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	EProbeState probeState;
+
+	UPROPERTY()
+	class AProbeRobot* me;
+
+	UPROPERTY()
+	class AMoney* target;
+
+	UPROPERTY()
+	class ARefinery* home;
+
+private:
+	void TickIdle();
+
+	void TickMoveMoney();
+
+	void TickCollect();
+
+	void TickMoveHome();
+
+	void TickDie();
+
+public:
+	void SetProbeState(EProbeState next);
 };

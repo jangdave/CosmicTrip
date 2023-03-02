@@ -2,6 +2,10 @@
 
 
 #include "ProbeFSMComponent.h"
+#include "Money.h"
+#include "ProbeRobot.h"
+#include "Refinery.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UProbeFSMComponent::UProbeFSMComponent()
@@ -20,7 +24,14 @@ void UProbeFSMComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
+
+	me = Cast<AProbeRobot>(GetOwner());
+
 	
+
+	home = Cast<ARefinery>(UGameplayStatics::GetActorOfClass(GetWorld(), ARefinery::StaticClass()));
+
+	probeState = EProbeState::IDLE;
 }
 
 
@@ -30,5 +41,74 @@ void UProbeFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+
+	switch (probeState)
+	{
+	case EProbeState::IDLE:
+		TickIdle();
+		break;
+	case EProbeState::MOVEMONEY:
+		TickMoveMoney();
+		break;
+	case EProbeState::COLLECT:
+		TickCollect();
+		break;
+	case EProbeState::MOVEHOME:
+		TickMoveHome();
+		break;
+	case EProbeState::DIE:
+		TickDie();
+		break;
+	}
+}
+
+void UProbeFSMComponent::TickIdle()
+{
+	target = Cast<AMoney>(UGameplayStatics::GetActorOfClass(GetWorld(), AMoney::StaticClass()));
+
+	if(target != nullptr)
+	{
+		SetProbeState(EProbeState::MOVEMONEY);
+	}
+}
+
+void UProbeFSMComponent::TickMoveMoney()
+{
+	FVector dir = target->GetActorLocation() - me->GetActorLocation();
+	me->AddMovementInput(dir.GetSafeNormal());
+
+	float targetDist = target->GetDistanceTo(me);
+
+	//if(targetDist < 50.0f)
+	//{
+		//SetProbeState(EProbeState::COLLECT);
+	//}
+}
+
+void UProbeFSMComponent::TickCollect()
+{
+	//SetProbeState(EProbeState::MOVEHOME);
+}
+
+void UProbeFSMComponent::TickMoveHome()
+{
+	//FVector dir = home->GetActorLocation() - me->GetActorLocation();
+	//me->AddMovementInput(dir.GetSafeNormal());
+
+	//float targetDist = home->GetDistanceTo(me);
+
+	//if(targetDist < 50.0f)
+	//{
+	//	SetProbeState(EProbeState::IDLE);
+	//}
+}
+
+void UProbeFSMComponent::TickDie()
+{
+}
+
+void UProbeFSMComponent::SetProbeState(EProbeState next)
+{
+	probeState = next;
 }
 

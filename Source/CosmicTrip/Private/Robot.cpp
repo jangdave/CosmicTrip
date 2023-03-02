@@ -2,13 +2,18 @@
 
 
 #include "Robot.h"
+
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 
 // Sets default values
 ARobot::ARobot()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	sphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("sphereComp"));
 	SetRootComponent(sphereComp);
@@ -27,6 +32,13 @@ void ARobot::BeginPlay()
 void ARobot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+}
+
+// Called to bind functionality to input
+void ARobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 
