@@ -13,5 +13,16 @@ UCLASS()
 class COSMICTRIP_API ARazerRobot : public ARobot
 {
 	GENERATED_BODY()
-	
+
+public:
+	// Sets default values for this character's properties
+	ARazerRobot();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 };

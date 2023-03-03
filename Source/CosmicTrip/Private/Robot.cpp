@@ -2,7 +2,6 @@
 
 
 #include "Robot.h"
-
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -13,10 +12,9 @@ ARobot::ARobot()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	sphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("sphereComp"));
-	SetRootComponent(sphereComp);
+	sphereComp->SetupAttachment(GetCapsuleComponent());
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("meshComp"));
 	meshComp->SetupAttachment(sphereComp);
 }

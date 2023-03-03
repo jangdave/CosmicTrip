@@ -44,6 +44,9 @@ public:
 	UPROPERTY()
 	class ARefinery* home;
 
+	UPROPERTY(EditAnywhere, Category = "setting")
+	float moveSpeed = 100.0f;
+
 private:
 	void TickIdle();
 

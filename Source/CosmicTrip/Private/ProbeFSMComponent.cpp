@@ -75,32 +75,34 @@ void UProbeFSMComponent::TickIdle()
 void UProbeFSMComponent::TickMoveMoney()
 {
 	FVector dir = target->GetActorLocation() - me->GetActorLocation();
-	me->AddMovementInput(dir.GetSafeNormal());
+
+	me->SetActorLocation(me->GetActorLocation() + dir.GetSafeNormal() * 100.0f * GetWorld()->DeltaTimeSeconds);
 
 	float targetDist = target->GetDistanceTo(me);
 
-	//if(targetDist < 50.0f)
-	//{
-		//SetProbeState(EProbeState::COLLECT);
-	//}
+	if(targetDist < 50.0f)
+	{
+		SetProbeState(EProbeState::COLLECT);
+	}
 }
 
 void UProbeFSMComponent::TickCollect()
 {
-	//SetProbeState(EProbeState::MOVEHOME);
+	SetProbeState(EProbeState::MOVEHOME);
 }
 
 void UProbeFSMComponent::TickMoveHome()
 {
-	//FVector dir = home->GetActorLocation() - me->GetActorLocation();
-	//me->AddMovementInput(dir.GetSafeNormal());
+	FVector dir = home->GetActorLocation() - me->GetActorLocation();
 
-	//float targetDist = home->GetDistanceTo(me);
+	me->SetActorLocation(me->GetActorLocation() + dir.GetSafeNormal() * 100.0f * GetWorld()->DeltaTimeSeconds);
 
-	//if(targetDist < 50.0f)
-	//{
-	//	SetProbeState(EProbeState::IDLE);
-	//}
+	float targetDist = home->GetDistanceTo(me);
+
+	if(targetDist < 50.0f)
+	{
+		SetProbeState(EProbeState::IDLE);
+	}
 }
 
 void UProbeFSMComponent::TickDie()
