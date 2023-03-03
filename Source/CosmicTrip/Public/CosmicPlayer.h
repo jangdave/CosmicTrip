@@ -52,9 +52,25 @@ public:
 
 protected:
 	
-		 //카메라
+	//카메라
 	UPROPERTY(VisibleAnywhere, Category = "VRCamera")
 	class UCameraComponent* VRCamera;
 
+	//컨트롤러 
+	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+	class UMotionControllerComponent* LeftHand;
+	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+	class UMotionControllerComponent* RightHand;
+
+	//사용할 손 모델
+	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+	class USkeletalMeshComponent* LeftHandMesh;
+	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+	class USkeletalMeshComponent* RightHandMesh;
+
+	//총을 생성한다.
+	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+	class USkeletalMeshComponent* Gun;
+	
 
 };
