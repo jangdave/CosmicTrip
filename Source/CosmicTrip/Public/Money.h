@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Refinery.generated.h"
+#include "Money.generated.h"
 
 UCLASS()
-class COSMICTRIP_API ARefinery : public AActor
+class COSMICTRIP_API AMoney : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ARefinery();
+	AMoney();
 
 protected:
 	// Called when the game starts or when spawned
@@ -22,9 +22,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 	UPROPERTY(EditAnywhere, Category = "component")
-	class UBoxComponent* boxComp;
+	class USphereComponent* sphereComp;
 
 	UPROPERTY(EditAnywhere, Category = "component")
 	class UStaticMeshComponent* meshComp;

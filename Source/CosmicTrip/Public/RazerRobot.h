@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Robot.h"
-#include "ProbeRobot.generated.h"
+#include "RazerRobot.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class COSMICTRIP_API AProbeRobot : public ARobot
+class COSMICTRIP_API ARazerRobot : public ARobot
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AProbeRobot();
+	ARazerRobot();
 
 protected:
 	// Called when the game starts or when spawned
@@ -25,8 +25,4 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = FSM)
-	class UProbeFSMComponent* probeFSM;
-
 };
