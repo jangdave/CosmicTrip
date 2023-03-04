@@ -2,7 +2,9 @@
 
 
 #include "RobotFactory.h"
+#include "RazerRobot.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ARobotFactory::ARobotFactory()
@@ -26,7 +28,8 @@ ARobotFactory::ARobotFactory()
 void ARobotFactory::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	razer = Cast<ARazerRobot>(UGameplayStatics::GetActorOfClass(GetWorld(), razerFactory));
 }
 
 // Called every frame
@@ -34,5 +37,10 @@ void ARobotFactory::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ARobotFactory::SpawnRazerRobot()
+{
+	
 }
 
