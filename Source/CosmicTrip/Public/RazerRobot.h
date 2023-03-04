@@ -25,4 +25,7 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FSM")
+	class URazerFSMComponent* razerFSM;
 };

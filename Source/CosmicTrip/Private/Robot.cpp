@@ -4,6 +4,7 @@
 #include "Robot.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ARobot::ARobot()
@@ -17,6 +18,8 @@ ARobot::ARobot()
 	sphereComp->SetupAttachment(GetCapsuleComponent());
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("meshComp"));
 	meshComp->SetupAttachment(sphereComp);
+
+	GetCharacterMovement()->GravityScale = 0;
 }
 
 // Called when the game starts or when spawned

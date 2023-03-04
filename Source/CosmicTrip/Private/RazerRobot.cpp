@@ -2,11 +2,13 @@
 
 
 #include "RazerRobot.h"
+#include "RazerFSMComponent.h"
 
 ARazerRobot::ARazerRobot()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	razerFSM = CreateDefaultSubobject<URazerFSMComponent>(TEXT("razerFSM"));
 }
 
 void ARazerRobot::BeginPlay()
