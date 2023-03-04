@@ -43,10 +43,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
 	float trackingRange = 700;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Range")
+	float acceptanceRadius = 5;
+	
+	class AAIController* ai;
+	
 	//hp계산할것
 	void OnTakeDamage();
 	
-private:
+/*private:*/
 
 	float hp;
 	float maxHP = 30;

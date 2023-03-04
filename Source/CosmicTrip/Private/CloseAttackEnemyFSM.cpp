@@ -5,6 +5,8 @@
 #include <Kismet/GameplayStatics.h>
 #include "CosmicPlayer.h"
 #include "CloseAttackEnemy.h"
+#include <NavigationSystem.h>
+#include "AIController.h"
 
 // Sets default values for this component's properties
 UCloseAttackEnemyFSM::UCloseAttackEnemyFSM()
@@ -67,7 +69,30 @@ void UCloseAttackEnemyFSM::TickMove()
 {
 	//플레이어를 향해 달려온다
 	FVector targetDir = mainTarget->GetActorLocation() - me->GetActorLocation();
-	me->AddMovementInput(targetDir.GetSafeNormal());
+
+	//내가 갈 수 있는 길 위에 공격 대상이 있는가
+	UNavigationSystemV1* ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+	FPathFindingQuery query; //길 찾을 수 있는지 여부
+	FAIMoveRequest request;
+	request.SetAcceptanceRadius(acceptanceRadius);
+	request.SetGoalLocation(mainTarget->GetActorLocation());
+
+	ai->BuildPathfindingQuery(request, query);
+	ns->FindPathSync(query);
+	FPathFindingResult result = ns->FindPathSync(query);
+
+	if (result.Result == ENavigationQueryResult::Success)
+	{
+		//me->AddMovementInput(targetDir.GetSafeNormal());
+		ai->MoveToLocation(mainTarget->GetActorLocation());
+	}
+// 	else
+// 	{
+// 		//타겟이 네비게이션 위에 없다면 랜덤한 위치로 돌아다니도록
+// 		//랜덤한 위치
+// 		//auto randLoc
+// 	}
+
 
 	float targetDist = mainTarget->GetDistanceTo(me);
 

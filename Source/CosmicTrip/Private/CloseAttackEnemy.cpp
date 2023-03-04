@@ -9,7 +9,6 @@ ACloseAttackEnemy::ACloseAttackEnemy()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 	
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempcaMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
 	if (tempcaMesh.Succeeded())
@@ -19,6 +18,13 @@ ACloseAttackEnemy::ACloseAttackEnemy()
 	}
 	
 	caEnemyFSM = CreateDefaultSubobject<UCloseAttackEnemyFSM>(TEXT("caEnemyFSM"));
+
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> gunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/FPWeapon/Mesh/SK_FPGun.SK_FPGun'"));
+	if (gunMesh.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(gunMesh.Object);
+		GetMesh()->SetRelativeLocationAndRotation(FVector(30, 0, 40), FRotator(0, -90, 0));
+	}
 
 }
 
