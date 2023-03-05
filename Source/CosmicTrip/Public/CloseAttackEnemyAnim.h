@@ -3,15 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Robot.h"
-#include "FightRobot.generated.h"
+#include "Animation/AnimInstance.h"
+#include "CloseAttackEnemyAnim.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class COSMICTRIP_API AFightRobot : public ARobot
+class COSMICTRIP_API UCloseAttackEnemyAnim : public UAnimInstance
 {
 	GENERATED_BODY()
+
+
 	
 };

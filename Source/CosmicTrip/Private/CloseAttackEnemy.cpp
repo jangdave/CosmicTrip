@@ -2,6 +2,7 @@
 
 
 #include "CloseAttackEnemy.h"
+#include "CloseAttackEnemyFSM.h"
 
 // Sets default values
 ACloseAttackEnemy::ACloseAttackEnemy()
@@ -9,15 +10,15 @@ ACloseAttackEnemy::ACloseAttackEnemy()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	closeAttackEnemy = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("closeAttackEnemy"));
-	closeAttackEnemy->SetupAttachment(RootComponent);
+	
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempcaMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
 	if (tempcaMesh.Succeeded())
 	{
-		closeAttackEnemy->SetSkeletalMesh(tempcaMesh.Object);
-		closeAttackEnemy->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+		GetMesh()->SetSkeletalMesh(tempcaMesh.Object);
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
 	}
 	
+	caEnemyFSM = CreateDefaultSubobject<UCloseAttackEnemyFSM>(TEXT("caEnemyFSM"));
 
 }
 
@@ -25,6 +26,7 @@ ACloseAttackEnemy::ACloseAttackEnemy()
 void ACloseAttackEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
 }
 
@@ -41,11 +43,3 @@ void ACloseAttackEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
-
-
-void ACloseAttackEnemy::Move()
-{
-
-}
-
-

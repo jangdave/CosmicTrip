@@ -4,26 +4,26 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "CloseAttackEnemyFSM.generated.h"
+#include "ProbeFSMComponent.generated.h"
 
 UENUM(BlueprintType)
-enum class EEnemyState : uint8
-{	
+enum class EProbeState : uint8
+{
 	IDLE,
-	MOVE,
-	ATTACK,
-	DAMAGE,
+	MOVEMONEY,
+	COLLECT,
+	MOVEHOME,
 	DIE,
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class COSMICTRIP_API UCloseAttackEnemyFSM : public UActorComponent
+class COSMICTRIP_API UProbeFSMComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UCloseAttackEnemyFSM();
+	UProbeFSMComponent();
 
 protected:
 	// Called when the game starts
@@ -33,29 +33,31 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	EEnemyState state;
+	EProbeState probeState;
 
-	class ACloseAttackEnemy* me;
-	class ACosmicPlayer* mainTarget;
+	UPROPERTY()
+	class AProbeRobot* me;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float attackRange = 400;
-	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float trackingRange = 700;
+	UPROPERTY()
+	class AMoney* target;
 
-	//hp계산할것
-	void OnTakeDamage();
-	
+	UPROPERTY()
+	class ARefinery* home;
+
+	UPROPERTY(EditAnywhere, Category = "setting")
+	float moveSpeed = 100.0f;
+
 private:
-
-	float hp;
-	float maxHP = 30;
-
-	
 	void TickIdle();
-	void TickMove();
-	void TickAttack();
-	void TickDamage();
+
+	void TickMoveMoney();
+
+	void TickCollect();
+
+	void TickMoveHome();
+
 	void TickDie();
-		
+
+public:
+	void SetProbeState(EProbeState next);
 };
