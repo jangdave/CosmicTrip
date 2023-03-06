@@ -5,6 +5,8 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "CloseAttackEnemy.h"
+#include "CloseAttackEnemyFSM.h"
 
 // Sets default values
 ABulletActor::ABulletActor()
@@ -40,6 +42,8 @@ void ABulletActor::BeginPlay()
 
 	FTimerHandle dieTimerHandle;
 	//GetWorldTimerManager().SetTimer(dieTimerHandle, this, &ABulletActor::OnDie, 0.1f);
+
+	spherComp->OnComponentBeginOverlap.AddDynamic(this, &ABulletActor::BulletPower);
 }
 
 // Called every frame
@@ -52,5 +56,15 @@ void ABulletActor::Tick(float DeltaTime)
 void ABulletActor::OnDie()
 {
 	//Destroy();
+}
+
+void ABulletActor::BulletPower(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	auto enemy = Cast<ACloseAttackEnemy>(OtherActor);
+
+	if (enemy != nullptr)
+	{
+		enemy->caEnemyFSM->OnTakeDamage();
+	}
 }
 
