@@ -64,6 +64,8 @@ public:
 
 	void SetRazerState(ERazerState next);
 
+	void FireRazerBeam();
+
 	bool bCheckFirst = true;
 
 	bool bCheckEmitter = false;
