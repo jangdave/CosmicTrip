@@ -32,7 +32,7 @@ public:
 	UPROPERTY()
 	class ARazerRobot* razer;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, Category = "factory")
 	TSubclassOf<class ARazerRobot> razerFactory;
 
 	void SpawnRazerRobot();

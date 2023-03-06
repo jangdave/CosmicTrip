@@ -28,4 +28,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "FSM")
 	class URazerFSMComponent* razerFSM;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UParticleSystem* beamFactory;
 };

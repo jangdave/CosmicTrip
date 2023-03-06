@@ -2,6 +2,7 @@
 
 
 #include "RazerFSMComponent.h"
+#include "AIController.h"
 #include "CloseAttackEnemy.h"
 #include "CosmicPlayer.h"
 #include "RazerRobot.h"
@@ -25,9 +26,9 @@ void URazerFSMComponent::BeginPlay()
 
 	me = Cast<ARazerRobot>(GetOwner());
 
-	player = Cast<ACosmicPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	aiRazer = Cast<AAIController>(me->GetController());
 
-	enemy = Cast<ACloseAttackEnemy>(UGameplayStatics::GetActorOfClass(GetWorld(), ACloseAttackEnemy::StaticClass()));
+	player = Cast<ACosmicPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	SetRazerState(ERazerState::IDLE);
 }
@@ -71,37 +72,89 @@ void URazerFSMComponent::TickIdle()
 
 void URazerFSMComponent::TickMove()
 {
-	FVector dir = player->GetActorLocation() - me->GetActorLocation();
+	aiRazer->MoveToLocation(player->GetActorLocation());
+	
+	float dist = me->GetDistanceTo(player);
 
-	me->AddMovementInput(dir);
-	//me->SetActorLocation(me->GetActorLocation() + dir.GetSafeNormal() * 100.0f * GetWorld()->DeltaTimeSeconds);
-
-	//float targetDist = player->GetDistanceTo(me);
-
-	//if (targetDist < 100.0f)
-	//{
-		//SetRazerState(ERazerState::PATROL);
-	//}
+	if (dist < 500.0f)
+	{
+		SetRazerState(ERazerState::PATROL);
+	}
 }
 
 void URazerFSMComponent::TickPatrol()
 {
-	//FVector forDir = me->GetActorForwardVector();
-	//FVector inDir = 
+	FVector newLocation = player->GetActorLocation();
+	
+	angleAxis+= multiplier;
 
+	if(angleAxis >=360.0f)
+	{
+		angleAxis = 0;
+	}
+
+	FVector rotateValue = dimensions.RotateAngleAxis(angleAxis, axisVector);
+
+	newLocation.X += rotateValue.X;
+	newLocation.Y += rotateValue.Y;
+	newLocation.Z += rotateValue.Z;
+
+	aiRazer->MoveToLocation(newLocation);
+
+	enemy = Cast<ACloseAttackEnemy>(UGameplayStatics::GetActorOfClass(GetWorld(), ACloseAttackEnemy::StaticClass()));
+
+	float dist = me->GetDistanceTo(enemy);
+
+	if (dist < 1000.0f)
+	{
+		SetRazerState(ERazerState::ATTACK);
+	}
 }
 
 void URazerFSMComponent::TickAttack()
 {
+	aiRazer->MoveToLocation(enemy->GetActorLocation());
 
+	float dist = me->GetDistanceTo(enemy);
+
+	if (dist < 300.0f)
+	{
+		SetRazerState(ERazerState::DAMAGE);
+	}
+	if (enemy == nullptr)
+	{
+		SetRazerState(ERazerState::PATROL);
+	}
 }
 
 void URazerFSMComponent::TickDamage()
 {
+	if (bCheckEmitter != true)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), me->beamFactory, me->GetActorTransform());
+		bCheckEmitter = true;
+	}
 
+	float dist = me->GetDistanceTo(enemy);
+
+	if (dist > 600.0f)
+	{
+		SetRazerState(ERazerState::ATTACK);
+		bCheckEmitter = false;
+	}
+	if (enemy == nullptr)
+	{
+		SetRazerState(ERazerState::PATROL);
+		bCheckEmitter = false;
+	}
 }
 
 void URazerFSMComponent::TickDie()
+{
+
+}
+
+void URazerFSMComponent::OnDamage(int32 damage)
 {
 
 }

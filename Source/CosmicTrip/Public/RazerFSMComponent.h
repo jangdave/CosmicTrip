@@ -45,6 +45,9 @@ public:
 	UPROPERTY()
 	class ACosmicPlayer* player;
 
+	UPROPERTY()
+	class AAIController* aiRazer;
+
 	void TickIdle();
 
 	void TickMove();
@@ -57,5 +60,19 @@ public:
 
 	void TickDie();
 
+	void OnDamage(int32 damage);
+
 	void SetRazerState(ERazerState next);
+
+	bool bCheckFirst = true;
+
+	bool bCheckEmitter = false;
+
+	FVector dimensions = FVector(300, 0, 0);
+
+	FVector axisVector = FVector(0, 0, 1);
+
+	float angleAxis = 0;
+
+	float multiplier = 1.0f;
 };
