@@ -5,3 +5,16 @@
 #include "CloseAttackEnemy.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+void UCloseAttackEnemyAnim::NativeBeginPlay()
+{
+	Super::NativeBeginPlay();
+
+	me = Cast<ACloseAttackEnemy>(TryGetPawnOwner());
+}
+
+void UCloseAttackEnemyAnim::AnimNotify_Attack()
+{
+	if (!this) return;
+
+	me->caEnemyFSM->OnHitEvent();	
+}
