@@ -26,11 +26,18 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	
-	UPROPERTY(EditDefaultsOnly, Category = "EnemySettings")
-	float walkSpeed = 400.f;
+	UPROPERTY(EditDefaultsOnly)
+	class USkeletalMeshComponent* gunMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnemySettings")
+	float walkSpeed = 250.f;
 
 	class UCloseAttackEnemyFSM* caEnemyFSM;
 
+	UPROPERTY(EditDefaultsOnly)
+	class UCloseAttackEnemyAnim* caEnemyAnim;
+
+
+	
 
 };
