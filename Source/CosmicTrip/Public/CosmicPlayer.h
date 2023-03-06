@@ -49,12 +49,43 @@ public:
 	//회전처리 함수
 	void Turn(const FInputActionValue& Values);
 
+	//총쏘기 기능
+	void OnActionFirePressed();
+	void OnActionFireReleased();
+
+	void DoFire();
+
+	//마우스 왼쪽버튼을 누르면 총알공장에서 총알을 만들어서 총구위치에 배치하고싶다.
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ABulletActor> bulletFactory;
+
+	class ABulletActor* bullet;
+
 
 protected:
 	
-		 //카메라
+	//카메라
 	UPROPERTY(VisibleAnywhere, Category = "VRCamera")
 	class UCameraComponent* VRCamera;
 
+	//컨트롤러 
+	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+	class UMotionControllerComponent* LeftHand;
+	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+	class UMotionControllerComponent* RightHand;
+
+	//사용할 손 모델
+	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+	class USkeletalMeshComponent* LeftHandMesh;
+	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+	class USkeletalMeshComponent* RightHandMesh;
+
+	//총을 생성한다.
+	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+	class USkeletalMeshComponent* gunMeshComp;
+
+	UPROPERTY(EditAnywhere)
+	float fireInterval = 0.5f;
+	FTimerHandle fireTimerHandle;
 
 };
