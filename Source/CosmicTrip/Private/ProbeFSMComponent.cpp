@@ -27,8 +27,6 @@ void UProbeFSMComponent::BeginPlay()
 
 	me = Cast<AProbeRobot>(GetOwner());
 
-	
-
 	home = Cast<ARefinery>(UGameplayStatics::GetActorOfClass(GetWorld(), ARefinery::StaticClass()));
 
 	probeState = EProbeState::IDLE;
@@ -80,7 +78,7 @@ void UProbeFSMComponent::TickMoveMoney()
 
 	float targetDist = target->GetDistanceTo(me);
 
-	if(targetDist < 50.0f)
+	if(targetDist < 100.0f)
 	{
 		SetProbeState(EProbeState::COLLECT);
 	}

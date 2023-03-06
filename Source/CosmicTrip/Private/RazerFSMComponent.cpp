@@ -4,8 +4,10 @@
 #include "RazerFSMComponent.h"
 #include "AIController.h"
 #include "CloseAttackEnemy.h"
+#include "CloseAttackEnemyFSM.h"
 #include "CosmicPlayer.h"
 #include "RazerRobot.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
@@ -129,9 +131,11 @@ void URazerFSMComponent::TickAttack()
 
 void URazerFSMComponent::TickDamage()
 {
+	me->GetCharacterMovement()->MaxWalkSpeed = 0;
+
 	if (bCheckEmitter != true)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), me->beamFactory, me->GetActorTransform());
+		FireRazerBeam();
 		bCheckEmitter = true;
 	}
 
@@ -139,11 +143,13 @@ void URazerFSMComponent::TickDamage()
 
 	if (dist > 600.0f)
 	{
+		me->GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 		SetRazerState(ERazerState::ATTACK);
 		bCheckEmitter = false;
 	}
 	if (enemy == nullptr)
 	{
+		me->GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 		SetRazerState(ERazerState::PATROL);
 		bCheckEmitter = false;
 	}
@@ -162,5 +168,20 @@ void URazerFSMComponent::OnDamage(int32 damage)
 void URazerFSMComponent::SetRazerState(ERazerState next)
 {
 	razerState = next;
+}
+
+void URazerFSMComponent::FireRazerBeam()
+{
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), me->beamFactory, me->GetActorLocation() + (me->GetActorUpVector() * 100.0f + me->GetActorForwardVector() * 50.0f), me->GetActorRotation());
+
+	FHitResult hitResult;
+	FCollisionQueryParams params;
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hitResult, me->GetActorLocation() + (me->GetActorUpVector() * 100.0f + me->GetActorForwardVector() * 50.0f), enemy->GetActorLocation(), ECollisionChannel::ECC_Visibility, params);
+
+	if (bHit)
+	{
+		auto target = Cast<ACloseAttackEnemy>(hitResult.GetActor());
+		//target->caEnemyFSM->OnTakeDamage();
+	}
 }
 
