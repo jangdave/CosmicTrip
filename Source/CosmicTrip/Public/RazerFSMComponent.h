@@ -70,11 +70,14 @@ public:
 
 	bool bCheckEmitter = false;
 
+	UPROPERTY(EditDefaultsOnly, Category = "circle")
 	FVector dimensions = FVector(300, 0, 0);
 
+	UPROPERTY(EditDefaultsOnly, Category = "circle")
 	FVector axisVector = FVector(0, 0, 1);
 
 	float angleAxis = 0;
 
+	UPROPERTY(EditDefaultsOnly, Category = "circle")
 	float multiplier = 1.0f;
 };

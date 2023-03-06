@@ -119,7 +119,7 @@ void URazerFSMComponent::TickAttack()
 
 	float dist = me->GetDistanceTo(enemy);
 
-	if (dist < 300.0f)
+	if (dist < 500.0f)
 	{
 		SetRazerState(ERazerState::DAMAGE);
 	}
