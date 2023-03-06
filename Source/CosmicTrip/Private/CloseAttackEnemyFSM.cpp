@@ -154,6 +154,7 @@ void UCloseAttackEnemyFSM::TickDamage()
 void UCloseAttackEnemyFSM::TickDie()
 {
 	//죽는 애니메이션을 재생시킨다
+	me->Destroy();
 
 }
 

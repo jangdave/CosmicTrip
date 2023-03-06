@@ -64,7 +64,8 @@ void ABulletActor::BulletPower(UPrimitiveComponent* OverlappedComponent, AActor*
 
 	if (enemy != nullptr)
 	{
-		enemy->caEnemyFSM->OnTakeDamage();
+		UE_LOG(LogTemp, Warning, TEXT("DDDDDD"));
+		enemy->caEnemyFSM->OnTakeDamage(10);
 	}
 }
 

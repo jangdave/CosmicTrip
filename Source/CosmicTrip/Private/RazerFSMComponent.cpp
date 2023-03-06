@@ -107,7 +107,7 @@ void URazerFSMComponent::TickPatrol()
 
 	float dist = me->GetDistanceTo(enemy);
 
-	if (dist < 1000.0f)
+	if (dist < 1000.0f && enemy != nullptr)
 	{
 		SetRazerState(ERazerState::ATTACK);
 	}

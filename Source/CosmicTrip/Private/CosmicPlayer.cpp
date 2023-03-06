@@ -114,7 +114,7 @@ void ACosmicPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &ACosmicPlayer::OnActionFirePressed);
 
-	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &ACosmicPlayer::OnActionFireReleased);
+	//PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &ACosmicPlayer::OnActionFireReleased);
 }
 
 void ACosmicPlayer::Move(const FInputActionValue& Values)
@@ -155,7 +155,7 @@ void ACosmicPlayer::OnActionFirePressed()
 
 void ACosmicPlayer::OnActionFireReleased()
 {
-	GetWorldTimerManager().ClearTimer(fireTimerHandle);
+	//GetWorldTimerManager().ClearTimer(fireTimerHandle);
 }
 
 void ACosmicPlayer::DoFire()
