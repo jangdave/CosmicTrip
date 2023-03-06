@@ -37,20 +37,49 @@ public:
 
 	class ACloseAttackEnemy* me;
 	class ACosmicPlayer* mainTarget;
+	//class ARobot* robots;
+	class AAIController* ai;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
 	float attackRange = 400;
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float trackingRange = 700;
+	float trackingRange = 900;
 
-	//hp계산할것
-	void OnTakeDamage();
+	UPROPERTY(EditDefaultsOnly, Category = "Range")
+	float acceptanceRadius = 5;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Range")
+	float targetDist;
+
+	float currentTime = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float attackDelayTime = 2;
+ 
 	
-private:
+	//hp계산할것
+	void OnTakeDamage(float damage);
 
+	void OnHitEvent();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bAttackPlay;
+
+	//랜덤한 위치
+	FVector randomLocation;
+	bool UpdateRandomLocation(float radius, FVector& outLocation);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Range")
+	float randLocationRadius = 400;
+
+	//체력
 	float hp;
 	float maxHP = 30;
 
+	
+	
+private:
 	
 	void TickIdle();
 	void TickMove();
