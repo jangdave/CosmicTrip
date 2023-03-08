@@ -11,7 +11,9 @@ enum class EEnemyState : uint8
 {	
 	IDLE,
 	MOVE,
+	MOVETOROBOT,
 	ATTACK,
+	ATTACKROBOT,
 	DAMAGE,
 	DIE,
 };
@@ -34,28 +36,41 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	EEnemyState state;
-
+		
 	class ACloseAttackEnemy* me;
 	class ACosmicPlayer* mainTarget;
-	//class ARobot* robots;
+	class ARazerRobot* razerTarget;
 	class AAIController* ai;
-
-
+	
+	
+	//멈춰서 플레이어 공격할 범위
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float attackRange = 400;
-	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float trackingRange = 900;
+	float attackRange = 200;
 
+	//플레이어 추적 거리
+	UPROPERTY(EditDefaultsOnly, Category = "Range")
+	float trackingRange = 4000;	
+	
+	//로봇 추적 거리
+	UPROPERTY(EditDefaultsOnly, Category = "Range")
+	float trackingRobotRange = 2000;
+
+	//플레이어와 나의 거리
+	UPROPERTY(EditDefaultsOnly, Category = "Range")
+	float targetDist;
+	
+	//로봇과 나의 거리
+	UPROPERTY(EditDefaultsOnly, Category = "Range")
+	float razerTargetDist;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
 	float acceptanceRadius = 5;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float targetDist;
 
 	float currentTime = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float attackDelayTime = 2;
+	float attackDelayTime = 0.5f;
  
 	
 	//hp계산할것
@@ -66,6 +81,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAttackPlay;
 
+	//enemy가 찾아갈 목적지
+	FVector wantedLocation; 
+		
+	
+
 	//랜덤한 위치
 	FVector randomLocation;
 	bool UpdateRandomLocation(float radius, FVector& outLocation);
@@ -73,18 +93,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
 	float randLocationRadius = 400;
 
+	//움직임
+	//void FindMoveTarget(FVector WantedLocation);
+
 	//체력
 	float hp;
-	float maxHP = 30;
-
-	
+	float maxHP = 30;		
 	
 private:
 	
 	void TickIdle();
 	void TickMove();
 	void TickAttack();
+	void TickAttackRobot();
 	void TickDamage();
-	void TickDie();
-		
+	void TickDie();	
+	void TickMoveToRobot();
 };

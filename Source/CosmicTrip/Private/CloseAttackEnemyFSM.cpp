@@ -8,6 +8,7 @@
 #include <NavigationSystem.h>
 #include "AIController.h"
 #include "CloseAttackEnemyAnim.h"
+#include "RazerRobot.h"
 
 // Sets default values for this component's properties
 UCloseAttackEnemyFSM::UCloseAttackEnemyFSM()
@@ -29,10 +30,9 @@ void UCloseAttackEnemyFSM::BeginPlay()
 	ai = Cast<AAIController>(me->GetController());
 	hp = maxHP;
 	
-	//랜덤한위치에 있을 것
+	//랜덤한위치에 있을 것	
 	UpdateRandomLocation(randLocationRadius, randomLocation);
 
-	
 }
 
 
@@ -49,8 +49,14 @@ void UCloseAttackEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, F
 	case EEnemyState::MOVE:
 		TickMove();
 		break;
+	case EEnemyState::MOVETOROBOT:
+		TickMoveToRobot();
+		break;
 	case EEnemyState::ATTACK:
 		TickAttack();
+	break;	
+	case EEnemyState::ATTACKROBOT:
+		TickAttackRobot();
 		break;
 	case EEnemyState::DAMAGE:
 		TickDamage();
@@ -58,71 +64,79 @@ void UCloseAttackEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, F
 	case EEnemyState::DIE:
 		TickDie();
 		break;	
+	}	
+}
+
+void UCloseAttackEnemyFSM::TickIdle()
+{	
+	mainTarget = Cast<ACosmicPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (!mainTarget) return;
+
+	state = EEnemyState::MOVE;
+}
+
+void UCloseAttackEnemyFSM::TickMove()
+{	
+	//플레이어의 방향, 위치 찾는다
+	//플레이어가 나와 감지거리 안에 있다면 플레이어를 향해 이동한다
+	
+	FVector targetDir = mainTarget->GetActorLocation() - me->GetActorLocation();
+	targetDist = mainTarget->GetDistanceTo(me);
+	if (targetDist <= trackingRange)
+	{
+		ai->MoveToLocation(mainTarget->GetActorLocation());
+		wantedLocation = mainTarget->GetActorLocation();
+	}
+
+	//플레이어를 공격할 범위 안에 들어왔다면 플레이어 공격 상태로 전환
+	if (attackRange >= targetDist)
+	{
+		state = EEnemyState::ATTACK;
+	}
+
+	//로봇을 찾는다
+	//로봇이 나와 감지범위 안에 있으면 로봇으로 향하는 state를 만든다
+	razerTarget = Cast<ARazerRobot>(UGameplayStatics::GetActorOfClass(GetWorld(), ARazerRobot::StaticClass()));
+	
+	if (trackingRange <= trackingRobotRange)
+	{
+		state = EEnemyState::MOVETOROBOT;
+	}
+
+}
+
+//로봇이 나와 감지거리 안에 있다면 로봇을 향해 이동한다
+void UCloseAttackEnemyFSM::TickMoveToRobot()
+{
+	//로봇의 방향과 위치를 찾는다
+	FVector robotDir = razerTarget->GetActorLocation() - me->GetActorLocation();
+	razerTargetDist = razerTarget->GetDistanceTo(me);
+
+	//로봇을 향해 이동한다
+	ai->MoveToLocation(razerTarget->GetActorLocation());
+
+	//로봇을 공격할 범위 안에 들어왔다면 로봇 공격 상태로 전환
+	if (razerTargetDist <= attackRange)
+	{
+		state = EEnemyState::ATTACKROBOT;
 	}
 	
 }
 
-void UCloseAttackEnemyFSM::TickIdle()
-{
-	mainTarget = Cast<ACosmicPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	if (!mainTarget) return;
-	state = EEnemyState::MOVE;
-
-}
-
-void UCloseAttackEnemyFSM::TickMove()
-{
-	//플레이어를 향해 달려온다
-	FVector targetDir = mainTarget->GetActorLocation() - me->GetActorLocation();
-
-	//내가 갈 수 있는 길 위에 공격 대상이 있는가
-	UNavigationSystemV1* ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
-	FPathFindingQuery query; //길 찾을 수 있는지 여부
-	FAIMoveRequest request;
-	request.SetAcceptanceRadius(acceptanceRadius);
-	request.SetGoalLocation(mainTarget->GetActorLocation());
-
-	ai->BuildPathfindingQuery(request, query);
-	ns->FindPathSync(query);
-	FPathFindingResult result = ns->FindPathSync(query);
-
-	if (result.Result == ENavigationQueryResult::Success)
-	{
-		//me->AddMovementInput(targetDir.GetSafeNormal());
-		ai->MoveToLocation(mainTarget->GetActorLocation());
-	}
-	else
-	{
-		//타겟이 네비게이션 위에 없다면 랜덤한 위치로 돌아다니도록
-		//랜덤한 위치
-		auto randLoc = ai->MoveToLocation(randomLocation);
-		if (randLoc == EPathFollowingRequestResult::Failed || EPathFollowingRequestResult::AlreadyAtGoal)
-		{
-			UpdateRandomLocation(randLocationRadius, randomLocation);
-		}
-	}
-
-	targetDist = mainTarget->GetDistanceTo(me);
-
-	//공격 범위에 들어오면 공격 상태로 전환
-	if (targetDist <= attackRange)
-	{
-		state = EEnemyState::ATTACK;
-	}
-	else if (targetDist > trackingRange)
-	{
-		state = EEnemyState::MOVE;
-	}
-}
-
+//플레이어를 공격
 void UCloseAttackEnemyFSM::TickAttack()
 {
+	//공격 애니메이션
+	me->caEnemyAnim->AnimNotify_Attack(TEXT("Attack"));
+	//일정 시간이 지나면
 	currentTime += GetWorld()->GetDeltaSeconds();
-	if (currentTime >= attackDelayTime)
-	{
-		float dist = mainTarget->GetDistanceTo(me);
 
-		if (dist > attackRange)
+	if (currentTime >= attackDelayTime)
+	{	
+		//플레이어와 나의 거리
+		targetDist = mainTarget->GetDistanceTo(me);
+				
+		if (targetDist > attackRange)
 		{
 			state = EEnemyState::MOVE;
 		}
@@ -134,7 +148,32 @@ void UCloseAttackEnemyFSM::TickAttack()
 			me->caEnemyAnim->bAttackPlay = true;
 		}
 	}
+}
 
+//로봇을 공격
+void UCloseAttackEnemyFSM::TickAttackRobot()
+{
+	//공격 애니메이션
+	me->caEnemyAnim->AnimNotify_Attack(TEXT("Attack"));
+	//일정 시간이 지나면
+	currentTime += GetWorld()->GetDeltaSeconds();
+	if (currentTime >= attackDelayTime) 
+	{
+		//로봇과 나의 거리
+		razerTargetDist = razerTarget->GetDistanceTo(me);
+
+		if (razerTargetDist > attackRange)
+		{
+			state = EEnemyState::MOVE;
+		}
+		else
+		{
+			currentTime = 0;
+			bAttackPlay = false;
+
+			me->caEnemyAnim->bAttackPlay = true;
+		}
+	}	
 }
 
 void UCloseAttackEnemyFSM::TickDamage()
@@ -146,7 +185,6 @@ void UCloseAttackEnemyFSM::TickDamage()
 		state = EEnemyState::MOVE;
 		currentTime = 0;
 	}
-
 	//플레이어의 공격을 받았다면 공격당한 애니메이션 재생
 	
 }
@@ -168,16 +206,11 @@ void UCloseAttackEnemyFSM::OnTakeDamage(float damage)
 	}
 }
 
+//플레이어의 체력을 깎을 것이다
 void UCloseAttackEnemyFSM::OnHitEvent()
 {
 	me->caEnemyFSM->bAttackPlay = false;
 
-	float dist = mainTarget->GetDistanceTo(me);
-	if (dist <= attackRange)
-	{
-		//mainTarge->
-		UE_LOG(LogTemp, Warning, TEXT("OnHitEvent() Attack"))
-	}
 }
 
 bool UCloseAttackEnemyFSM::UpdateRandomLocation(float radius, FVector& outLocation)
@@ -185,7 +218,7 @@ bool UCloseAttackEnemyFSM::UpdateRandomLocation(float radius, FVector& outLocati
 	UNavigationSystemV1* ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
 	FNavLocation navLoc;
 
-	bool result = ns->GetRandomReachablePointInRadius(me->GetActorLocation(), radius, navLoc);
+	bool result = ns->GetRandomPointInNavigableRadius(me->GetActorLocation(), radius, navLoc);
 
 	if (result)
 	{
@@ -194,4 +227,5 @@ bool UCloseAttackEnemyFSM::UpdateRandomLocation(float radius, FVector& outLocati
 
 	return result;
 }
+
 

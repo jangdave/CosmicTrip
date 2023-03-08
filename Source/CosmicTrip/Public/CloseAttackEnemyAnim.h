@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+	// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -32,7 +32,13 @@ public:
 	bool bAttackPlay;
 
 	UFUNCTION()
-	void AnimNotify_Attack();
+	void AnimNotify_Idle();
+
+	UFUNCTION()
+	void AnimNotify_Attack(FName sectionName);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UAnimMontage* enemyMontageFactory;
 
 	
 };
