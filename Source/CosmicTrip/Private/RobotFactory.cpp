@@ -2,7 +2,9 @@
 
 
 #include "RobotFactory.h"
+#include "RazerRobot.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ARobotFactory::ARobotFactory()
@@ -26,7 +28,12 @@ ARobotFactory::ARobotFactory()
 void ARobotFactory::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	razer = Cast<ARazerRobot>(UGameplayStatics::GetActorOfClass(GetWorld(), razerFactory));
+
+	// 임시 스폰
+	FTimerHandle timer;
+	GetWorld()->GetTimerManager().SetTimer(timer, this, &ARobotFactory::SpawnRazerRobot, 3, false);
 }
 
 // Called every frame
@@ -34,5 +41,10 @@ void ARobotFactory::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ARobotFactory::SpawnRazerRobot()
+{
+	GetWorld()->SpawnActor<ARazerRobot>(razerFactory, GetActorLocation() + GetActorForwardVector() * 200.0f, GetActorRotation());
 }
 

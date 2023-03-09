@@ -28,4 +28,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "component")
 	class UStaticMeshComponent* meshComp;
+
+	UPROPERTY()
+	class ARazerRobot* razer;
+
+	UPROPERTY(EditDefaultsOnly, Category = "factory")
+	TSubclassOf<class ARazerRobot> razerFactory;
+
+	void SpawnRazerRobot();
 };
