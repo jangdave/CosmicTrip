@@ -171,6 +171,11 @@ void ACosmicPlayer::DoFire()
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	GetWorld()->SpawnActor<ABulletActor>(bulletFactory, Trans, Params);
 
+	//발사될때 반짝이 이펙트를 표시하고싶다.
+
+	//물체에 부딪치면 이펙트를 표시하고싶다.
+	FTransform trans()//hitInfo.impactpoint
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), bulletImpactFactory, trans);
 }
 
 

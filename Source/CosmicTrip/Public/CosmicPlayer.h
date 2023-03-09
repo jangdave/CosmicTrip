@@ -88,4 +88,7 @@ protected:
 	float fireInterval = 0.5f;
 	FTimerHandle fireTimerHandle;
 
+	//ÆøÆÈ°øÀå
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* bulletImpactFactory;
 };
