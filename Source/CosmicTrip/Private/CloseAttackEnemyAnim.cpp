@@ -24,3 +24,8 @@ void UCloseAttackEnemyAnim::AnimNotify_Attack(FName sectionName)
 		
 	me->PlayAnimMontage(enemyMontageFactory, 1, TEXT("Attack"));
 }
+
+void UCloseAttackEnemyAnim::AnimNotify_Die(FName sectionName)
+{
+	if (!this) return;
+}

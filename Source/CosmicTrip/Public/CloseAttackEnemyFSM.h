@@ -35,13 +35,13 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EEnemyState state;
 		
 	class ACloseAttackEnemy* me;
 	class ACosmicPlayer* mainTarget;
 	class ARazerRobot* razerTarget;
 	class AAIController* ai;
-	
 	
 	//멈춰서 플레이어 공격할 범위
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
@@ -66,12 +66,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
 	float acceptanceRadius = 5;
 
-
 	float currentTime = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float attackDelayTime = 0.5f;
- 
+	float attackDelayTime = 0.5f; 
 	
 	//hp계산할것
 	void OnTakeDamage(float damage);
@@ -82,8 +80,7 @@ public:
 	bool bAttackPlay;
 
 	//enemy가 찾아갈 목적지
-	FVector wantedLocation; 
-		
+	FVector wantedLocation; 		
 	
 
 	//랜덤한 위치
@@ -102,6 +99,7 @@ public:
 	
 private:
 	
+	void SetState(EEnemyState next);
 	void TickIdle();
 	void TickMove();
 	void TickAttack();

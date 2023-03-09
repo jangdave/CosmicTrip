@@ -27,6 +27,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bcaEnemyAttackEnd;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bcaEnemyDieEnd;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAttackPlay;
@@ -37,8 +40,14 @@ public:
 	UFUNCTION()
 	void AnimNotify_Attack(FName sectionName);
 
+	UFUNCTION()
+	void AnimNotify_Die(FName sectionName);
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UAnimMontage* enemyMontageFactory;
+
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	EEnemyState state;
 
 	
 };

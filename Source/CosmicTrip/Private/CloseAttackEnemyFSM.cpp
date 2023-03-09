@@ -67,12 +67,19 @@ void UCloseAttackEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, F
 	}	
 }
 
+void UCloseAttackEnemyFSM::SetState(EEnemyState next)
+{
+	state = next;
+	me->caEnemyAnim->state = next;
+	currentTime = 0;
+}
+
 void UCloseAttackEnemyFSM::TickIdle()
 {	
 	mainTarget = Cast<ACosmicPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	if (!mainTarget) return;
 
-	state = EEnemyState::MOVE;
+	SetState(EEnemyState::MOVE);
 }
 
 void UCloseAttackEnemyFSM::TickMove()
@@ -91,7 +98,7 @@ void UCloseAttackEnemyFSM::TickMove()
 	//플레이어를 공격할 범위 안에 들어왔다면 플레이어 공격 상태로 전환
 	if (attackRange >= targetDist)
 	{
-		state = EEnemyState::ATTACK;
+		SetState(EEnemyState::ATTACK);
 	}
 
 	//로봇을 찾는다
@@ -100,7 +107,7 @@ void UCloseAttackEnemyFSM::TickMove()
 	
 	if (trackingRange <= trackingRobotRange)
 	{
-		state = EEnemyState::MOVETOROBOT;
+		SetState(EEnemyState::MOVETOROBOT);
 	}
 
 }
@@ -118,7 +125,7 @@ void UCloseAttackEnemyFSM::TickMoveToRobot()
 	//로봇을 공격할 범위 안에 들어왔다면 로봇 공격 상태로 전환
 	if (razerTargetDist <= attackRange)
 	{
-		state = EEnemyState::ATTACKROBOT;
+		SetState(EEnemyState::ATTACKROBOT);
 	}
 	
 }
@@ -126,45 +133,51 @@ void UCloseAttackEnemyFSM::TickMoveToRobot()
 //플레이어를 공격
 void UCloseAttackEnemyFSM::TickAttack()
 {
-	//공격 애니메이션
-	me->caEnemyAnim->AnimNotify_Attack(TEXT("Attack"));
 	//일정 시간이 지나면
 	currentTime += GetWorld()->GetDeltaSeconds();
 
+	//일정 시간에 한번씩 공격하기
 	if (currentTime >= attackDelayTime)
 	{	
-		//플레이어와 나의 거리
-		targetDist = mainTarget->GetDistanceTo(me);
-				
-		if (targetDist > attackRange)
-		{
-			state = EEnemyState::MOVE;
-		}
-		else
-		{
-			currentTime = 0;
-			bAttackPlay = false;
+		//공격 애니메이션
+		me->caEnemyAnim->AnimNotify_Attack(TEXT("Attack"));
+		
+		currentTime = 0;
+// 		bAttackPlay = false;
+// 		else
+// 		{
+// 
+// 			me->caEnemyAnim->bAttackPlay = true;
+// 		}
 
-			me->caEnemyAnim->bAttackPlay = true;
-		}
 	}
+	//공격범위를 벗어나면 move로 전환
+	targetDist = mainTarget->GetDistanceTo(me);
+
+	if (targetDist > attackRange)
+	{
+		SetState(EEnemyState::MOVE);
+	}
+
 }
 
 //로봇을 공격
 void UCloseAttackEnemyFSM::TickAttackRobot()
 {
-	//공격 애니메이션
-	me->caEnemyAnim->AnimNotify_Attack(TEXT("Attack"));
+
 	//일정 시간이 지나면
 	currentTime += GetWorld()->GetDeltaSeconds();
 	if (currentTime >= attackDelayTime) 
 	{
+		//공격 애니메이션
+		me->caEnemyAnim->AnimNotify_Attack(TEXT("Attack"));
+		
 		//로봇과 나의 거리
 		razerTargetDist = razerTarget->GetDistanceTo(me);
 
 		if (razerTargetDist > attackRange)
 		{
-			state = EEnemyState::MOVE;
+			SetState(EEnemyState::MOVE);
 		}
 		else
 		{
@@ -182,7 +195,7 @@ void UCloseAttackEnemyFSM::TickDamage()
 
 	if (currentTime > 1)
 	{
-		state = EEnemyState::MOVE;
+		SetState(EEnemyState::MOVE);
 		currentTime = 0;
 	}
 	//플레이어의 공격을 받았다면 공격당한 애니메이션 재생
@@ -202,7 +215,14 @@ void UCloseAttackEnemyFSM::OnTakeDamage(float damage)
 
 	if (maxHP <= 0)
 	{
-		state = EEnemyState::DIE;
+		SetState(EEnemyState::DIE);
+
+		me->caEnemyAnim->bcaEnemyDieEnd = false;
+		me->caEnemyAnim->AnimNotify_Die(TEXT("Death"));
+	}
+	else
+	{
+		SetState(EEnemyState::MOVE);
 	}
 }
 
