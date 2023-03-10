@@ -37,6 +37,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Move;
+		
+	// 총쏘기
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	class UInputAction* IA_Fire;
 
 	//사용할 이동처리함수
 	void Move(const FInputActionValue& Values);
@@ -48,6 +52,7 @@ public:
 
 	//회전처리 함수
 	void Turn(const FInputActionValue& Values);
+
 
 	//총쏘기 기능
 	void OnActionFirePressed();
@@ -91,4 +96,41 @@ protected:
 	//폭팔공장
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* bulletImpactFactory;
+
+
+	//잡기버튼을 누르면 물체를 잡고 싶다.
+	//필요속성: 입력액션
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Grab;
+ 
+	//필요속성: 잡을범위
+ 	UPROPERTY(EditDefaultsOnly, Category = "Grab")
+	float GrabRange =100;
+
+	//잡은물체를 기억하자
+	//메모리관리를 위해서 UPROPERTY라는 스마트 포인터를 
+	//사용해주는게 좋다. 
+	UPROPERTY()
+	class UPrimitiveComponent* GrabbedObject;
+
+	//잡은녀석이 있는지 여부 기억할변수
+	bool IsGrabbed = false;
+
+	//던지면 원하는 방향으로 날아가도록 하고싶다.
+	//던질 방향
+	FVector ThrowDirection;
+	//던질 힘
+	UPROPERTY(EditAnywhere, Category = "Grab")
+	float ThrowPower = 1000;
+
+	// 직전 위치
+	FVector PrevPos;
+
+	//잡기시도 기능
+	void TryGrab();
+	//놓기
+	void UnTryGrab();
+	//잡고있는중
+	void Grabbing();
+
 };
