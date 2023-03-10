@@ -54,7 +54,7 @@ void UCloseAttackEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, F
 		break;
 	case EEnemyState::ATTACK:
 		TickAttack();
-	break;	
+		break;	
 	case EEnemyState::ATTACKROBOT:
 		TickAttackRobot();
 		break;
@@ -78,6 +78,7 @@ void UCloseAttackEnemyFSM::TickIdle()
 {	
 	mainTarget = Cast<ACosmicPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	if (!mainTarget) return;
+	
 
 	SetState(EEnemyState::MOVE);
 }
@@ -89,6 +90,7 @@ void UCloseAttackEnemyFSM::TickMove()
 	
 	FVector targetDir = mainTarget->GetActorLocation() - me->GetActorLocation();
 	targetDist = mainTarget->GetDistanceTo(me);
+	me->caEnemyAnim->bChooseWalk = true;
 	if (targetDist <= trackingRange)
 	{
 		ai->MoveToLocation(mainTarget->GetActorLocation());
@@ -139,8 +141,8 @@ void UCloseAttackEnemyFSM::TickAttack()
 	//일정 시간에 한번씩 공격하기
 	if (currentTime >= attackDelayTime)
 	{	
-		//공격 애니메이션
-		me->caEnemyAnim->AnimNotify_Attack(TEXT("Attack"));
+		//공격 montage 호출
+		me->caEnemyAnim->AnimAttack(TEXT("Attack"));
 		
 		currentTime = 0;
 // 		bAttackPlay = false;
@@ -164,66 +166,95 @@ void UCloseAttackEnemyFSM::TickAttack()
 //로봇을 공격
 void UCloseAttackEnemyFSM::TickAttackRobot()
 {
-
 	//일정 시간이 지나면
 	currentTime += GetWorld()->GetDeltaSeconds();
 	if (currentTime >= attackDelayTime) 
 	{
 		//공격 애니메이션
-		me->caEnemyAnim->AnimNotify_Attack(TEXT("Attack"));
-		
-		//로봇과 나의 거리
-		razerTargetDist = razerTarget->GetDistanceTo(me);
+		me->caEnemyAnim->AnimAttack(TEXT("Attack"));
+		currentTime = 0;
 
-		if (razerTargetDist > attackRange)
-		{
-			SetState(EEnemyState::MOVE);
-		}
-		else
-		{
-			currentTime = 0;
-			bAttackPlay = false;
-
-			me->caEnemyAnim->bAttackPlay = true;
-		}
 	}	
+	//로봇과 나의 거리
+	razerTargetDist = razerTarget->GetDistanceTo(me);
+	//공격 범위를 벗어나면 move로 전환
+	if (razerTargetDist > attackRange)
+	{
+		SetState(EEnemyState::MOVE);
+	}
+		
 }
 
 void UCloseAttackEnemyFSM::TickDamage()
 {
 	currentTime += GetWorld()->GetDeltaSeconds();
 
+	//죽음 애니메이션 호출
+	me->caEnemyAnim->AnimDamage(TEXT("Damage"));
+
 	if (currentTime > 1)
 	{
 		SetState(EEnemyState::MOVE);
 		currentTime = 0;
-	}
-	//플레이어의 공격을 받았다면 공격당한 애니메이션 재생
+	}	
 	
 }
 
 void UCloseAttackEnemyFSM::TickDie()
 {
-	//죽는 애니메이션을 재생시킨다
+	//bug - delete
+	me->caEnemyAnim->bcaEnemyDieEnd = true;
+
+	if (false == me->caEnemyAnim->bcaEnemyDieEnd)
+	{
+		return;
+	}
+	//죽음 애니메이션 호출
+	me->caEnemyAnim->AnimDie(TEXT("Die"));
+	//소멸
 	me->Destroy();
 
 }
 
 void UCloseAttackEnemyFSM::OnTakeDamage(float damage)
-{
+{	
 	maxHP -= damage;
+	SetState(EEnemyState::DAMAGE);
 
 	if (maxHP <= 0)
 	{
 		SetState(EEnemyState::DIE);
-
-		me->caEnemyAnim->bcaEnemyDieEnd = false;
-		me->caEnemyAnim->AnimNotify_Die(TEXT("Death"));
+		UE_LOG(LogTemp, Warning, TEXT("UCloseAttackEnemyFSM::OnTakeDamage________________________"))
+		//me->caEnemyAnim->bcaEnemyDieEnd = false;
 	}
 	else
 	{
 		SetState(EEnemyState::MOVE);
 	}
+}
+
+void UCloseAttackEnemyFSM::OnDamageProcess(int damageValue)
+{
+	me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Damage"));
+	/*
+	UE_LOG(LogTemp, Error, TEXT("Damaged"));
+	if (ai)
+	{
+		ai->StopMovement();
+	}
+	maxHP -= damageValue;
+	if (maxHP <= 0)
+	{
+		maxHP = 0;
+		SetState(EEnemyState::DIE);
+		me->caEnemyAnim->AnimDie(TEXT("Die"));
+	}
+	else
+	{
+		SetState(EEnemyState::DAMAGE);
+		me->caEnemyAnim->AnimDie(TEXT("Damage"));
+	}
+	*/
 }
 
 //플레이어의 체력을 깎을 것이다

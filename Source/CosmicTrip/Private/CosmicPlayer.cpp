@@ -145,6 +145,15 @@ void ACosmicPlayer::Turn(const FInputActionValue& Values)
 
 void ACosmicPlayer::OnActionFirePressed()
 {
+	//Camera Shake
+	APlayerCameraManager* CSM = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	CSM->StartCameraShake(camShakeFactory);
+
+	if (nullptr != canShakeInstance && canShakeInstance->IsFinished() == false)
+	{
+		CSM->StopCameraShake(canShakeInstance);
+	}
+	canShakeInstance = CSM->StartCameraShake(camShakeFactory);
 
 	//타이머를 이용해서 한번클릭이후에 자동으로 생성하여 나가게하고싶다.
 	//GetWorld()->GetTimerManager().SetTimer(fireTimerHandle, this, &ACosmicPlayer::DoFire, fireInterval, true);
@@ -169,7 +178,7 @@ void ACosmicPlayer::DoFire()
 	FTransform Trans = gunMeshComp->GetSocketTransform(FName(TEXT("FirePosition")));
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	GetWorld()->SpawnActor<ABulletActor>(bulletFactory, Trans, Params);
+	GetWorld()->SpawnActor<ABulletActor>(bulletFactory, Trans, Params);		
 
 }
 

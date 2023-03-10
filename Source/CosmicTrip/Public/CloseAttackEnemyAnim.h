@@ -19,7 +19,7 @@ public:
 
 	virtual void NativeBeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyFSM")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAnim")
 	EEnemyState caEnemyState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -34,14 +34,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAttackPlay;
 
-	UFUNCTION()
-	void AnimNotify_Idle();
+	//로봇 혹은 플레이어를 향해 걸을지 선택할 변수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bChooseWalk;
 
 	UFUNCTION()
-	void AnimNotify_Attack(FName sectionName);
+	void AnimAttack(FName sectionName);
 
 	UFUNCTION()
-	void AnimNotify_Die(FName sectionName);
+	void AnimDamage(FName sectionName);
+
+	UFUNCTION()
+	void AnimDie(FName sectionName);
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UAnimMontage* enemyMontageFactory;

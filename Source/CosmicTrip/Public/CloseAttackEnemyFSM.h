@@ -39,6 +39,7 @@ public:
 	EEnemyState state;
 		
 	class ACloseAttackEnemy* me;
+	class UCloseAttackEnemyFSM* caEnemyAnim;
 	class ACosmicPlayer* mainTarget;
 	class ARazerRobot* razerTarget;
 	class AAIController* ai;
@@ -56,11 +57,11 @@ public:
 	float trackingRobotRange = 2000;
 
 	//플레이어와 나의 거리
-	UPROPERTY(EditDefaultsOnly, Category = "Range")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Range")
 	float targetDist;
 	
 	//로봇과 나의 거리
-	UPROPERTY(EditDefaultsOnly, Category = "Range")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Range")
 	float razerTargetDist;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
@@ -69,10 +70,12 @@ public:
 	float currentTime = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float attackDelayTime = 0.5f; 
+	float attackDelayTime = 1.5f;
 	
 	//hp계산할것
 	void OnTakeDamage(float damage);
+
+	void OnDamageProcess(int damageValue);
 
 	void OnHitEvent();
 
