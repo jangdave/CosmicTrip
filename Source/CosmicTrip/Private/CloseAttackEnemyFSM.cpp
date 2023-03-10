@@ -30,7 +30,7 @@ void UCloseAttackEnemyFSM::BeginPlay()
 	ai = Cast<AAIController>(me->GetController());
 	hp = maxHP;
 	
-	//·£´ıÇÑÀ§Ä¡¿¡ ÀÖÀ» °Í	
+	//ëœë¤í•œìœ„ì¹˜ì— ìˆì„ ê²ƒ	
 	UpdateRandomLocation(randLocationRadius, randomLocation);
 
 }
@@ -85,8 +85,8 @@ void UCloseAttackEnemyFSM::TickIdle()
 
 void UCloseAttackEnemyFSM::TickMove()
 {	
-	//ÇÃ·¹ÀÌ¾îÀÇ ¹æÇâ, À§Ä¡ Ã£´Â´Ù
-	//ÇÃ·¹ÀÌ¾î°¡ ³ª¿Í °¨Áö°Å¸® ¾È¿¡ ÀÖ´Ù¸é ÇÃ·¹ÀÌ¾î¸¦ ÇâÇØ ÀÌµ¿ÇÑ´Ù
+	//í”Œë ˆì´ì–´ì˜ ë°©í–¥, ìœ„ì¹˜ ì°¾ëŠ”ë‹¤
+	//í”Œë ˆì´ì–´ê°€ ë‚˜ì™€ ê°ì§€ê±°ë¦¬ ì•ˆì— ìˆë‹¤ë©´ í”Œë ˆì´ì–´ë¥¼ í–¥í•´ ì´ë™í•œë‹¤
 	
 	FVector targetDir = mainTarget->GetActorLocation() - me->GetActorLocation();
 	targetDist = mainTarget->GetDistanceTo(me);
@@ -97,14 +97,14 @@ void UCloseAttackEnemyFSM::TickMove()
 		wantedLocation = mainTarget->GetActorLocation();
 	}
 
-	//ÇÃ·¹ÀÌ¾î¸¦ °ø°İÇÒ ¹üÀ§ ¾È¿¡ µé¾î¿Ô´Ù¸é ÇÃ·¹ÀÌ¾î °ø°İ »óÅÂ·Î ÀüÈ¯
+	//í”Œë ˆì´ì–´ë¥¼ ê³µê²©í•  ë²”ìœ„ ì•ˆì— ë“¤ì–´ì™”ë‹¤ë©´ í”Œë ˆì´ì–´ ê³µê²© ìƒíƒœë¡œ ì „í™˜
 	if (attackRange >= targetDist)
 	{
 		SetState(EEnemyState::ATTACK);
 	}
 
-	//·Îº¿À» Ã£´Â´Ù
-	//·Îº¿ÀÌ ³ª¿Í °¨Áö¹üÀ§ ¾È¿¡ ÀÖÀ¸¸é ·Îº¿À¸·Î ÇâÇÏ´Â state¸¦ ¸¸µç´Ù
+	//ë¡œë´‡ì„ ì°¾ëŠ”ë‹¤
+	//ë¡œë´‡ì´ ë‚˜ì™€ ê°ì§€ë²”ìœ„ ì•ˆì— ìˆìœ¼ë©´ ë¡œë´‡ìœ¼ë¡œ í–¥í•˜ëŠ” stateë¥¼ ë§Œë“ ë‹¤
 	razerTarget = Cast<ARazerRobot>(UGameplayStatics::GetActorOfClass(GetWorld(), ARazerRobot::StaticClass()));
 	
 	if (trackingRange <= trackingRobotRange)
@@ -114,17 +114,17 @@ void UCloseAttackEnemyFSM::TickMove()
 
 }
 
-//·Îº¿ÀÌ ³ª¿Í °¨Áö°Å¸® ¾È¿¡ ÀÖ´Ù¸é ·Îº¿À» ÇâÇØ ÀÌµ¿ÇÑ´Ù
+//ë¡œë´‡ì´ ë‚˜ì™€ ê°ì§€ê±°ë¦¬ ì•ˆì— ìˆë‹¤ë©´ ë¡œë´‡ì„ í–¥í•´ ì´ë™í•œë‹¤
 void UCloseAttackEnemyFSM::TickMoveToRobot()
 {
-	//·Îº¿ÀÇ ¹æÇâ°ú À§Ä¡¸¦ Ã£´Â´Ù
+	//ë¡œë´‡ì˜ ë°©í–¥ê³¼ ìœ„ì¹˜ë¥¼ ì°¾ëŠ”ë‹¤
 	FVector robotDir = razerTarget->GetActorLocation() - me->GetActorLocation();
 	razerTargetDist = razerTarget->GetDistanceTo(me);
 
-	//·Îº¿À» ÇâÇØ ÀÌµ¿ÇÑ´Ù
+	//ë¡œë´‡ì„ í–¥í•´ ì´ë™í•œë‹¤
 	ai->MoveToLocation(razerTarget->GetActorLocation());
 
-	//·Îº¿À» °ø°İÇÒ ¹üÀ§ ¾È¿¡ µé¾î¿Ô´Ù¸é ·Îº¿ °ø°İ »óÅÂ·Î ÀüÈ¯
+	//ë¡œë´‡ì„ ê³µê²©í•  ë²”ìœ„ ì•ˆì— ë“¤ì–´ì™”ë‹¤ë©´ ë¡œë´‡ ê³µê²© ìƒíƒœë¡œ ì „í™˜
 	if (razerTargetDist <= attackRange)
 	{
 		SetState(EEnemyState::ATTACKROBOT);
@@ -132,16 +132,16 @@ void UCloseAttackEnemyFSM::TickMoveToRobot()
 	
 }
 
-//ÇÃ·¹ÀÌ¾î¸¦ °ø°İ
+//í”Œë ˆì´ì–´ë¥¼ ê³µê²©
 void UCloseAttackEnemyFSM::TickAttack()
 {
-	//ÀÏÁ¤ ½Ã°£ÀÌ Áö³ª¸é
+	//ì¼ì • ì‹œê°„ì´ ì§€ë‚˜ë©´
 	currentTime += GetWorld()->GetDeltaSeconds();
 
-	//ÀÏÁ¤ ½Ã°£¿¡ ÇÑ¹ø¾¿ °ø°İÇÏ±â
+	//ì¼ì • ì‹œê°„ì— í•œë²ˆì”© ê³µê²©í•˜ê¸°
 	if (currentTime >= attackDelayTime)
 	{	
-		//°ø°İ montage È£Ãâ
+		//ê³µê²© montage í˜¸ì¶œ
 		me->caEnemyAnim->AnimAttack(TEXT("Attack"));
 		
 		currentTime = 0;
@@ -153,7 +153,7 @@ void UCloseAttackEnemyFSM::TickAttack()
 // 		}
 
 	}
-	//°ø°İ¹üÀ§¸¦ ¹ş¾î³ª¸é move·Î ÀüÈ¯
+	//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚˜ë©´ moveë¡œ ì „í™˜
 	targetDist = mainTarget->GetDistanceTo(me);
 
 	if (targetDist > attackRange)
@@ -163,21 +163,21 @@ void UCloseAttackEnemyFSM::TickAttack()
 
 }
 
-//·Îº¿À» °ø°İ
+//ë¡œë´‡ì„ ê³µê²©
 void UCloseAttackEnemyFSM::TickAttackRobot()
 {
-	//ÀÏÁ¤ ½Ã°£ÀÌ Áö³ª¸é
+	//ì¼ì • ì‹œê°„ì´ ì§€ë‚˜ë©´
 	currentTime += GetWorld()->GetDeltaSeconds();
 	if (currentTime >= attackDelayTime) 
 	{
-		//°ø°İ ¾Ö´Ï¸ŞÀÌ¼Ç
+		//ê³µê²© ì• ë‹ˆë©”ì´ì…˜
 		me->caEnemyAnim->AnimAttack(TEXT("Attack"));
 		currentTime = 0;
 
 	}	
-	//·Îº¿°ú ³ªÀÇ °Å¸®
+	//ë¡œë´‡ê³¼ ë‚˜ì˜ ê±°ë¦¬
 	razerTargetDist = razerTarget->GetDistanceTo(me);
-	//°ø°İ ¹üÀ§¸¦ ¹ş¾î³ª¸é move·Î ÀüÈ¯
+	//ê³µê²© ë²”ìœ„ë¥¼ ë²—ì–´ë‚˜ë©´ moveë¡œ ì „í™˜
 	if (razerTargetDist > attackRange)
 	{
 		SetState(EEnemyState::MOVE);
@@ -189,8 +189,8 @@ void UCloseAttackEnemyFSM::TickDamage()
 {
 	currentTime += GetWorld()->GetDeltaSeconds();
 
-	//Á×À½ ¾Ö´Ï¸ŞÀÌ¼Ç È£Ãâ
-	me->caEnemyAnim->AnimDamage(TEXT("Damage"));
+	//ê³µê²©ë°›ì€ ì• ë‹ˆë©”ì´ì…˜ í˜¸ì¶œ
+	me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Damage"));
 
 	if (currentTime > 1)
 	{
@@ -209,9 +209,9 @@ void UCloseAttackEnemyFSM::TickDie()
 	{
 		return;
 	}
-	//Á×À½ ¾Ö´Ï¸ŞÀÌ¼Ç È£Ãâ
-	me->caEnemyAnim->AnimDie(TEXT("Die"));
-	//¼Ò¸ê
+	//ì£½ìŒ ì• ë‹ˆë©”ì´ì…˜ í˜¸ì¶œ
+	me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Die"));
+	//ì†Œë©¸
 	me->Destroy();
 
 }
@@ -235,8 +235,9 @@ void UCloseAttackEnemyFSM::OnTakeDamage(float damage)
 
 void UCloseAttackEnemyFSM::OnDamageProcess(int damageValue)
 {
+/*
 	me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Damage"));
-	/*
+	
 	UE_LOG(LogTemp, Error, TEXT("Damaged"));
 	if (ai)
 	{
@@ -257,7 +258,7 @@ void UCloseAttackEnemyFSM::OnDamageProcess(int damageValue)
 	*/
 }
 
-//ÇÃ·¹ÀÌ¾îÀÇ Ã¼·ÂÀ» ±ğÀ» °ÍÀÌ´Ù
+//í”Œë ˆì´ì–´ì˜ ì²´ë ¥ì„ ê¹ì„ ê²ƒì´ë‹¤
 void UCloseAttackEnemyFSM::OnHitEvent()
 {
 	me->caEnemyFSM->bAttackPlay = false;
