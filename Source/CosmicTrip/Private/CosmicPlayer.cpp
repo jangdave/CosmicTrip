@@ -9,6 +9,7 @@
 #include <MotionControllerComponent.h>
 #include "Kismet/GameplayStatics.h"
 #include "BulletActor.h"
+#include <Sound/SoundBase.h>
 
 #define PRINTToScreen(msg) UE_LOG(LogTemp, Warning, TEXT("%s"), *msg)
 
@@ -68,6 +69,7 @@ ACosmicPlayer::ACosmicPlayer()
 		gunMeshComp->SetRelativeLocationAndRotation(FVector(3.8f, 5.0f, -10.6f), FRotator(-5, -90, 55));
 		gunMeshComp->SetRelativeScale3D(FVector(0.5f));
 
+
 	}
 
 	//던짐총을 생성하고싶다
@@ -86,7 +88,17 @@ ACosmicPlayer::ACosmicPlayer()
 
 	}
 
-}
+	//사운드를 만들고싶다.
+	GunFireSound = CreateDefaultSubobject<USoundBase>(TEXT("GunFireSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> fireSound(TEXT("/Script/Engine.SoundWave'/Game/CosmicVR/Sound/Sound_Ddock_cutegun_.Sound_Ddock_cutegun_'"));
+	if (fireSound.Succeeded())
+	{
+		GunFireSound = (fireSound.Object);
+	
+
+
+	}
+}	
 
 // Called when the game starts or when spawned
 void ACosmicPlayer::BeginPlay()
@@ -196,6 +208,7 @@ void ACosmicPlayer::OnActionFirePressed()
 	if(BeChooseGrenade)
 	{
 		DoFire();
+		UGameplayStatics::PlaySoundAtLocation(this, GunFireSound, GetActorLocation(),GetActorRotation());
 	}
 	//그렇지않다면(던짐총)
 	else

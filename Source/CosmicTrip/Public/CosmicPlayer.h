@@ -127,6 +127,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* bulletImpactFactory;
 
+	//사운드
+	UPROPERTY(VisibleAnyWhere, Category = "Sound")
+	class USoundBase* GunFireSound;
 
 	//잡기버튼을 누르면 물체를 잡고 싶다.
 	//필요속성: 입력액션
