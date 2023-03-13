@@ -36,23 +36,29 @@ public:
 
 	//로봇 혹은 플레이어를 향해 걸을지 선택할 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bChooseWalk;
+	bool bChangeMove;
 
-	UFUNCTION()
-	void AnimAttack(FName sectionName);
+	//UFUNCTION()
+	//void AnimAttack(FName sectionName);
 
-	UFUNCTION()
-	void AnimDamage(FName sectionName);
+	//UFUNCTION()
+	//void AnimDamage(FName sectionName);
 
-	UFUNCTION()
-	void AnimDie(FName sectionName);
+	//UFUNCTION()
+	//void AnimDie(FName sectionName);
 
+	UFUNCTION(BlueprintCallable)
+	void EndAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void EndDamage();
+
+	UFUNCTION(BlueprintCallable)
+	void EndDie();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UAnimMontage* enemyMontageFactory;
 
 	UPROPERTY(EditDefaultsOnly, Category = "State")
 	EEnemyState state;
-
-	
 };

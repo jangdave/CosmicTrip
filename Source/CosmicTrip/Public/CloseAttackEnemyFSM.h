@@ -14,8 +14,6 @@ enum class EEnemyState : uint8
 	MOVETOROBOT,
 	ATTACK,
 	ATTACKROBOT,
-	DAMAGE,
-	DIE,
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -75,12 +73,11 @@ public:
 	//hp계산할것
 	void OnTakeDamage(float damage);
 
-	void OnDamageProcess(int damageValue);
-
 	void OnHitEvent();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bAttackPlay;
+	bool bAttackAnimPlay;
+
+	bool bDeathAnimPlay;
 
 	//enemy가 찾아갈 목적지
 	FVector wantedLocation; 		
@@ -107,7 +104,7 @@ private:
 	void TickMove();
 	void TickAttack();
 	void TickAttackRobot();
-	void TickDamage();
+//	void TickDamage();
 	void TickDie();	
 	void TickMoveToRobot();
 };

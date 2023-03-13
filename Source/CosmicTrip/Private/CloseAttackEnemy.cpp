@@ -52,6 +52,7 @@ void ACloseAttackEnemy::BeginPlay()
 
 	caEnemyAnim = Cast<UCloseAttackEnemyAnim>(GetMesh()->GetAnimInstance());
 	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+
 	
 
 	

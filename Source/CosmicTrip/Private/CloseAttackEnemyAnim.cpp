@@ -3,6 +3,7 @@
 
 #include "CloseAttackEnemyAnim.h"
 #include "CloseAttackEnemy.h"
+#include "CloseAttackEnemyFSM.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 void UCloseAttackEnemyAnim::NativeBeginPlay()
@@ -10,29 +11,46 @@ void UCloseAttackEnemyAnim::NativeBeginPlay()
 	Super::NativeBeginPlay();
 
 	me = Cast<ACloseAttackEnemy>(TryGetPawnOwner());
+
+	//meFSM = Cast<ACloseAttackEnemyFSM>()
 }
 
+// void UCloseAttackEnemyAnim::AnimAttack(FName sectionName)
+// {
+// 	//if (!this) return;
+// 
+// 	me->caEnemyFSM->OnHitEvent();
+// 		
+// 	me->PlayAnimMontage(enemyMontageFactory, 1, TEXT("Attack"));
+// }
+// 
+// void UCloseAttackEnemyAnim::AnimDamage(FName sectionName)
+// {
+// 	//if (!this) return;
+// 	me->PlayAnimMontage(enemyMontageFactory, 1, TEXT("Damage"));
+// }
+// 
+// void UCloseAttackEnemyAnim::AnimDie(FName sectionName)
+// {
+// 	//if (!this) return;
+// 	me->PlayAnimMontage(enemyMontageFactory, 1, TEXT("Die"));
+// }
 
-
-void UCloseAttackEnemyAnim::AnimAttack(FName sectionName)
+void UCloseAttackEnemyAnim::EndAttack()
 {
-	//if (!this) return;
-
-	me->caEnemyFSM->OnHitEvent();
-		
-	me->PlayAnimMontage(enemyMontageFactory, 1, TEXT("Attack"));
+	me->GetCharacterMovement()->MaxWalkSpeed = me->walkSpeed;
+	me->caEnemyFSM->state = EEnemyState::IDLE;
+	me->caEnemyFSM->bAttackAnimPlay = false;
 }
 
-void UCloseAttackEnemyAnim::AnimDamage(FName sectionName)
+void UCloseAttackEnemyAnim::EndDamage()
 {
-	//if (!this) return;
-	me->PlayAnimMontage(enemyMontageFactory, 1, TEXT("Damage"));
+	me->GetCharacterMovement()->MaxWalkSpeed = me->walkSpeed;
 }
 
-void UCloseAttackEnemyAnim::AnimDie(FName sectionName)
+void UCloseAttackEnemyAnim::EndDie()
 {
-	//if (!this) return;
-	me->PlayAnimMontage(enemyMontageFactory, 1, TEXT("Die"));
+	me->Destroy();
 }
 
 
