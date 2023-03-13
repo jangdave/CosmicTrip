@@ -165,6 +165,12 @@
       ]
     },
     {
+      "name": "Ansible Rulebook",
+      "description": "Ansible rulebook files",
+      "url": "https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json",
+      "fileMatch": ["**/rulebooks/*.yml", "**/rulebooks/*.yaml"]
+    },
+    {
       "name": "Ansible Inventory",
       "description": "Ansible inventory files",
       "url": "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json",
@@ -1924,6 +1930,12 @@
       "url": "https://raw.githubusercontent.com/jfrog/jfrog-cli/v2/schema/filespec-schema.json"
     },
     {
+      "name": "JMeter DSL cli config schema",
+      "description": "jmdsl JMeter DSL command line configuration file schema definition",
+      "fileMatch": ["*.jmdsl.yml", "*.jmdsl.yaml", "*.jmdsl.json"],
+      "url": "https://github.com/abstracta/jmeter-java-dsl/releases/latest/download/jmdsl-config-schema.json"
+    },
+    {
       "name": "Jovo Language Models",
       "description": "JSON Schema for Jovo language Models (https://www.jovo.tech/docs/model)",
       "url": "https://json.schemastore.org/jovo-language-model.json"
@@ -2199,6 +2211,12 @@
       "description": "Configuration file defining a configured carver for a data pack for Minecraft.",
       "fileMatch": ["**/data/*/worldgen/configured_carver/*.json"],
       "url": "https://json.schemastore.org/minecraft-configured-carver.json"
+    },
+    {
+      "name": "Minecraft Data Pack Damage Type",
+      "description": "Configuration file defining a damage type for a data pack for Minecraft.",
+      "fileMatch": ["**/data/*/damage_type/*.json"],
+      "url": "https://json.schemastore.org/minecraft-damage-type.json"
     },
     {
       "name": "Minecraft Data Pack Dimension Type",
@@ -3016,6 +3034,12 @@
       "url": "https://json.schemastore.org/semgrep.json"
     },
     {
+      "name": "Serenity Code Generator (Sergen)",
+      "description": "Serenity code generator (sergen) configuration file",
+      "fileMatch": ["sergen.json", "sergen.*.json", "*.sergen.json"],
+      "url": "https://json.schemastore.org/sergen.json"
+    },
+    {
       "name": "settings.job",
       "description": "Azure Webjob settings file",
       "fileMatch": ["settings.job"],
@@ -3084,6 +3108,12 @@
       "description": "Source Map files version 3",
       "fileMatch": ["*.map"],
       "url": "https://json.schemastore.org/sourcemap-v3.json"
+    },
+    {
+      "name": "Sourcery",
+      "description": "Sourcery YAML Schema",
+      "fileMatch": [".sourcery.yaml"],
+      "url": "https://json.schemastore.org/sourcery_yaml_schema.json"
     },
     {
       "name": "SpecIF",
@@ -4589,9 +4619,10 @@
       "name": "Pantsbuild",
       "description": "Pantsbuild configuration file",
       "fileMatch": ["pants*.toml"],
-      "url": "https://json.schemastore.org/pantsbuild-2.14.0.json",
+      "url": "https://json.schemastore.org/pantsbuild-2.15.0.json",
       "versions": {
-        "2.14.0": "https://json.schemastore.org/pantsbuild-2.14.0.json"
+        "2.14.0": "https://json.schemastore.org/pantsbuild-2.14.0.json",
+        "2.15.0": "https://json.schemastore.org/pantsbuild-2.15.0.json"
       }
     },
     {

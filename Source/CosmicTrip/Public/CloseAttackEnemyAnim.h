@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+	// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -27,12 +27,27 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bcaEnemyAttackEnd;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bcaEnemyDieEnd;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAttackPlay;
 
 	UFUNCTION()
-	void AnimNotify_Attack();
+	void AnimNotify_Idle();
+
+	UFUNCTION()
+	void AnimNotify_Attack(FName sectionName);
+
+	UFUNCTION()
+	void AnimNotify_Die(FName sectionName);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UAnimMontage* enemyMontageFactory;
+
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	EEnemyState state;
 
 	
 };

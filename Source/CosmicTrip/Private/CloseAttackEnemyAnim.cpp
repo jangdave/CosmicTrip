@@ -12,9 +12,20 @@ void UCloseAttackEnemyAnim::NativeBeginPlay()
 	me = Cast<ACloseAttackEnemy>(TryGetPawnOwner());
 }
 
-void UCloseAttackEnemyAnim::AnimNotify_Attack()
+void UCloseAttackEnemyAnim::AnimNotify_Idle()
+{
+}
+
+void UCloseAttackEnemyAnim::AnimNotify_Attack(FName sectionName)
 {
 	if (!this) return;
 
-	me->caEnemyFSM->OnHitEvent();	
+	me->caEnemyFSM->OnHitEvent();
+		
+	me->PlayAnimMontage(enemyMontageFactory, 1, TEXT("Attack"));
+}
+
+void UCloseAttackEnemyAnim::AnimNotify_Die(FName sectionName)
+{
+	if (!this) return;
 }

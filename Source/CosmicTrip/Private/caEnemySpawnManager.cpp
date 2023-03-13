@@ -24,7 +24,7 @@ void AcaEnemySpawnManager::BeginPlay()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AcaEnemySpawnSpot::StaticClass(), spawnList);
 	
 	//int randTime = FMath::RandRange(minTime, maxTime);
-	GetWorldTimerManager().SetTimer(timerHandlespawncaEnemy, this, &AcaEnemySpawnManager::SpawnEnemy, 20);
+	GetWorldTimerManager().SetTimer(timerHandlespawncaEnemy, this, &AcaEnemySpawnManager::SpawnEnemy, 1);
 	UE_LOG(LogTemp, Error, TEXT("AcaEnemySpawnManager::BeginPlay()"))
 }
 
