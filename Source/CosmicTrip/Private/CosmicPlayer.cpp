@@ -26,7 +26,7 @@ ACosmicPlayer::ACosmicPlayer()
 	LeftHand->SetTrackingMotionSource(FName("Left"));
 	RightHand = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("RightHand"));
 	RightHand->SetupAttachment(RootComponent);
-	RightHand->SetTrackingMotionSource(FName("Right"));	
+	RightHand->SetTrackingMotionSource(FName("Right"));
 
 	//왼손 스켈레탈메시컴포넌트 만들기
 	LeftHandMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LeftHandMesh"));
@@ -65,7 +65,6 @@ ACosmicPlayer::ACosmicPlayer()
 		gunMeshComp->SetSkeletalMesh(GunMesh.Object);
 		gunMeshComp->SetRelativeLocationAndRotation(FVector(3.8f, 5.0f, -10.6f), FRotator(-5, -90, 55));
 		gunMeshComp->SetRelativeScale3D(FVector(0.5f));
-
 	}
 
 	//던짐총을 생성하고싶다
@@ -81,9 +80,7 @@ ACosmicPlayer::ACosmicPlayer()
 		ThrowGuncomp->SetStaticMesh(ThrowGunMeshComp.Object);
 		ThrowGuncomp->SetRelativeLocationAndRotation(FVector(20, 20, 10), FRotator(0, -90, -90));
 		ThrowGuncomp->SetRelativeScale3D(FVector(1.3f));
-
 	}
-
 }
 
 // Called when the game starts or when spawned
@@ -136,12 +133,9 @@ void ACosmicPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//기본총의 기능과 이걸눌렀을때 행동할 것을 BindAction으로 연결.
 	PlayerInputComponent->BindAction(TEXT("Grenadegun"), IE_Pressed, this, &ACosmicPlayer::OnActionGrenade);
 
-
 	//던짐총의 기능과 이걸눌렀을때 행동할 것을 BindAction으로 연결.
 	UE_LOG(LogTemp, Warning, TEXT("action"));
 	PlayerInputComponent->BindAction(TEXT("ThrowGun"), IE_Pressed, this, &ACosmicPlayer::OnActionThrowGun);
-
-
 
 	//PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &ACosmicPlayer::OnActionFireReleased);
 }
