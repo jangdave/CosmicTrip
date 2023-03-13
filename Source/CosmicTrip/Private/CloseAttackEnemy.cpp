@@ -41,6 +41,7 @@ ACloseAttackEnemy::ACloseAttackEnemy()
 	}
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	GetMesh()->SetCollisionProfileName(TEXT("CloseAttackEnemyPreset"));
 	
 }
 
@@ -51,6 +52,7 @@ void ACloseAttackEnemy::BeginPlay()
 
 	caEnemyAnim = Cast<UCloseAttackEnemyAnim>(GetMesh()->GetAnimInstance());
 	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+
 	
 
 	
