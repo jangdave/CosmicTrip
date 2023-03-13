@@ -80,10 +80,10 @@ public:
 	void Turn(const FInputActionValue& Values);
 
 
-	//총쏘기 기능
+	//1번키와 2번키에대한 (총교체)입력처리를 하고싶다.
 	void OnActionFirePressed();
 	void OnActionFireReleased();
-
+	//총쏘기 기능
 	void DoFire();
 
 	//던짐총 스태틱메시 추가
@@ -94,7 +94,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABulletActor> bulletFactory;
 
-	class ABulletActor* bullet;
+	class ABulletActor* bullet;                   
 
 
 protected:

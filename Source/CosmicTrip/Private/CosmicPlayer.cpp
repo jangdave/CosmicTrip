@@ -10,6 +10,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "BulletActor.h"
 
+#define PRINTToScreen(msg) UE_LOG(LogTemp, Warning, TEXT("%s"), *msg)
+
 // Sets default values
 ACosmicPlayer::ACosmicPlayer()
 {
@@ -79,7 +81,7 @@ ACosmicPlayer::ACosmicPlayer()
 	{
 		//오브젝트로 등록을 한다.
 		ThrowGuncomp->SetStaticMesh(ThrowGunMeshComp.Object);
-		ThrowGuncomp->SetRelativeLocationAndRotation(FVector(20, 20, 10), FRotator(0, -90, -90));
+		ThrowGuncomp->SetRelativeLocationAndRotation(FVector(2, 8, -6), FRotator(-40, 180, 14));
 		ThrowGuncomp->SetRelativeScale3D(FVector(1.3f));
 
 	}
@@ -129,21 +131,10 @@ void ACosmicPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		//binding for moving
 		InputSystem->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ACosmicPlayer::Move);
 		InputSystem->BindAction(IA_Mouse, ETriggerEvent::Triggered, this, &ACosmicPlayer::Turn);
+		InputSystem->BindAction(IA_ThrowGun, ETriggerEvent::Started, this, &ACosmicPlayer::OnActionThrowGun);
+		InputSystem->BindAction(IA_Grenade, ETriggerEvent::Started, this, &ACosmicPlayer::OnActionGrenade);
+		InputSystem->BindAction(IA_Fire, ETriggerEvent::Started, this, &ACosmicPlayer::OnActionFirePressed);
 	}
-
-	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &ACosmicPlayer::OnActionFirePressed);
-
-	//기본총의 기능과 이걸눌렀을때 행동할 것을 BindAction으로 연결.
-	PlayerInputComponent->BindAction(TEXT("Grenadegun"), IE_Pressed, this, &ACosmicPlayer::OnActionGrenade);
-
-
-	//던짐총의 기능과 이걸눌렀을때 행동할 것을 BindAction으로 연결.
-	UE_LOG(LogTemp, Warning, TEXT("action"));
-	PlayerInputComponent->BindAction(TEXT("ThrowGun"), IE_Pressed, this, &ACosmicPlayer::OnActionThrowGun);
-
-
-
-	//PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &ACosmicPlayer::OnActionFireReleased);
 }
 
 
@@ -164,7 +155,6 @@ void ACosmicPlayer::OnActionGrenade()
 
 void ACosmicPlayer::OnActionThrowGun()
 {
-
 	ChooseGun(false);
 }
 
@@ -200,12 +190,26 @@ void ACosmicPlayer::OnActionFirePressed()
 	//타이머를 이용해서 한번클릭이후에 자동으로 생성하여 나가게하고싶다.
 	//GetWorld()->GetTimerManager().SetTimer(fireTimerHandle, this, &ACosmicPlayer::DoFire, fireInterval, true);
 
-	// 더블클릭을하면 총알이 안나가는 방법 해결 
-	DoFire();
+
+	//만약 기본총(그랜에이드건)이라면
+	// gunMeshComp 가 있다면
+	if(BeChooseGrenade)
+	{
+		DoFire();
+	}
+	//그렇지않다면(던짐총)
+	else
+	{
+
+		//물건을 잡고싶다.
+		TryGrab();
+
+	}
 }
 
 void ACosmicPlayer::OnActionFireReleased()
 {
+	//UnTryGrab();
 	//GetWorldTimerManager().ClearTimer(fireTimerHandle);
 }
 
@@ -225,7 +229,12 @@ void ACosmicPlayer::DoFire()
 
 void ACosmicPlayer::TryGrab()
 {
-	//중심점
+	FHitResult hitResult;
+	FVector start;
+	FVector end;
+	//GetWorld()->LineTraceSingleByChannel(hitResult,start)
+	
+	/*//중심점
 	FVector Center = RightHand->GetComponentLocation();
 	//충돌체크해야함
 	//충돌한 물체들 기록할 배열
@@ -282,7 +291,7 @@ void ACosmicPlayer::TryGrab()
 
 	//프리포즈 초기값
 	PrevPos = RightHand->GetComponentLocation();
-	}
+	}*/
 
 }
 
