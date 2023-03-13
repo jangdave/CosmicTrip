@@ -943,6 +943,12 @@
       "url": "https://wixplosives.github.io/codux-config-schema/codux.config.schema.json"
     },
     {
+      "name": "devcontainer.json",
+      "description": "Schema for dev container configuration files.",
+      "fileMatch": ["devcontainer.json", ".devcontainer.json"],
+      "url": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json"
+    },
+    {
       "name": "JSON schema for Codecov configuration files",
       "description": "Schema for codecov.yml files.",
       "fileMatch": [".codecov.yml", "codecov.yml"],
@@ -3303,6 +3309,12 @@
       "name": "Traefik v2 File Provider",
       "description": "Traefik v2 Dynamic Configuration File Provider",
       "url": "https://json.schemastore.org/traefik-v2-file-provider.json"
+    },
+    {
+      "name": "transcend.yml",
+      "description": "Define personal data schema in code using Transcend",
+      "fileMatch": ["transcend.yml", "transcend.yaml"],
+      "url": "https://raw.githubusercontent.com/transcend-io/cli/main/transcend-yml-schema-v4.json"
     },
     {
       "name": "trunk.yaml schema",

@@ -97,11 +97,18 @@ public:
 	class ABulletActor* bullet;
 
 
-protected:
+public:
 	
 	//카메라
 	UPROPERTY(VisibleAnywhere, Category = "VRCamera")
 	class UCameraComponent* VRCamera;
+	
+	//CameraShake
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UCameraShakeBase> camShakeFactory;
+
+	UPROPERTY(EditAnywhere)
+	class UCameraShakeBase* canShakeInstance;
 
 	//컨트롤러 
 	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
