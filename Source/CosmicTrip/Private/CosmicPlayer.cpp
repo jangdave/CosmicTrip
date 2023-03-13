@@ -26,13 +26,13 @@ ACosmicPlayer::ACosmicPlayer()
 	LeftHand->SetTrackingMotionSource(FName("Left"));
 	RightHand = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("RightHand"));
 	RightHand->SetupAttachment(RootComponent);
-	RightHand->SetTrackingMotionSource(FName("Right"));
+	RightHand->SetTrackingMotionSource(FName("Right"));	
 
 	//왼손 스켈레탈메시컴포넌트 만들기
 	LeftHandMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LeftHandMesh"));
 
 	//왼손 스켈레탈메시 로드해서 할당
-	ConstructorHelpers::FObjectFinder<USkeletalMesh>TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/MannequinsXR/Meshes/SKM_MannyXR_left.SKM_MannyXR_left'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/MannequinsXR/Meshes/SKM_MannyXR_left.SKM_MannyXR_left'"));
 	if (TempMesh.Succeeded())
 	{
 		LeftHandMesh->SetSkeletalMesh(TempMesh.Object);
@@ -68,6 +68,22 @@ ACosmicPlayer::ACosmicPlayer()
 
 	}
 
+	//던짐총을 생성하고싶다
+	ThrowGuncomp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ThrowGuncomp"));
+	//던짐총을 최상단 루트컴포넌트에 부착하고싶다
+	ThrowGuncomp->SetupAttachment(RightHandMesh);
+	//던짐총메쉬경로를 불러오고싶다.
+	ConstructorHelpers::FObjectFinder<UStaticMesh> ThrowGunMeshComp(TEXT("/Script/Engine.StaticMesh'/Game/GunMesh/free_sci-fi_gun/Cube_059_Cube_056_BASE_0.Cube_059_Cube_056_BASE_0'"));
+	//던짐총을 성공적으로 불러왔다면
+	if (ThrowGunMeshComp.Succeeded())
+	{
+		//오브젝트로 등록을 한다.
+		ThrowGuncomp->SetStaticMesh(ThrowGunMeshComp.Object);
+		ThrowGuncomp->SetRelativeLocationAndRotation(FVector(20, 20, 10), FRotator(0, -90, -90));
+		ThrowGuncomp->SetRelativeScale3D(FVector(1.3f));
+
+	}
+
 }
 
 // Called when the game starts or when spawned
@@ -90,6 +106,8 @@ void ACosmicPlayer::BeginPlay()
 	}
 
 	bullet = Cast<ABulletActor>(UGameplayStatics::GetActorOfClass(GetWorld(), bulletFactory));
+
+	ChooseGun(true);
 }
 
 // Called every frame
@@ -115,7 +133,39 @@ void ACosmicPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &ACosmicPlayer::OnActionFirePressed);
 
+	//기본총의 기능과 이걸눌렀을때 행동할 것을 BindAction으로 연결.
+	PlayerInputComponent->BindAction(TEXT("Grenadegun"), IE_Pressed, this, &ACosmicPlayer::OnActionGrenade);
+
+
+	//던짐총의 기능과 이걸눌렀을때 행동할 것을 BindAction으로 연결.
+	UE_LOG(LogTemp, Warning, TEXT("action"));
+	PlayerInputComponent->BindAction(TEXT("ThrowGun"), IE_Pressed, this, &ACosmicPlayer::OnActionThrowGun);
+
+
+
 	//PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &ACosmicPlayer::OnActionFireReleased);
+}
+
+
+void ACosmicPlayer::ChooseGun(bool bGrenade)
+{
+	//if(BeChooseGrenade == false && bGrenade == true)
+	BeChooseGrenade = bGrenade;
+	//이 총을 선택했을 때 어떤총(메쉬)를 보여줄것이다
+	gunMeshComp->SetVisibility(bGrenade);
+	ThrowGuncomp->SetVisibility(!bGrenade);
+
+}
+
+void ACosmicPlayer::OnActionGrenade()
+{
+	ChooseGun(true);
+}
+
+void ACosmicPlayer::OnActionThrowGun()
+{
+
+	ChooseGun(false);
 }
 
 void ACosmicPlayer::Move(const FInputActionValue& Values)
