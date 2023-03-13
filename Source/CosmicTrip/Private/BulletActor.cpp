@@ -31,7 +31,6 @@ ABulletActor::ABulletActor()
 	movementComp->MaxSpeed = 5000;
 	movementComp->bShouldBounce = true;
 	movementComp->Bounciness = 0.5f;
-	meshComp->SetCollisionProfileName(TEXT("BulletActorPreset"));
 }
 
 // Called when the game starts or when spawned
@@ -56,7 +55,7 @@ void ABulletActor::Tick(float DeltaTime)
 
 void ABulletActor::OnDie()
 {
-	//Destroy();
+	Destroy();
 }
 
 void ABulletActor::BulletPower(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -65,10 +64,10 @@ void ABulletActor::BulletPower(UPrimitiveComponent* OverlappedComponent, AActor*
 
 	if (enemy != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ABulletActor::BulletPower OnTakeDamage"));
 		enemy->caEnemyFSM->OnTakeDamage(10);
-		//enemy->caEnemyFSM->OnDamageProcess(10);
 
+		//FVector 
+		enemy->GetActorLocation();
 	}
 }
 

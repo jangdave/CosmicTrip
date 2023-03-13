@@ -74,7 +74,7 @@ void URazerFSMComponent::TickIdle()
 
 void URazerFSMComponent::TickMove()
 {
-	aiRazer->MoveToLocation(player->GetActorLocation());
+	aiRazer->MoveToLocation(FVector(player->GetActorLocation().X, player->GetActorLocation().Y, 1500.0f));
 	
 	float dist = me->GetDistanceTo(player);
 
@@ -86,7 +86,7 @@ void URazerFSMComponent::TickMove()
 
 void URazerFSMComponent::TickPatrol()
 {
-	FVector newLocation = player->GetActorLocation();
+	FVector newLocation = FVector(player->GetActorLocation().X, player->GetActorLocation().Y, 1500.0f);
 	
 	angleAxis+= multiplier;
 
@@ -115,7 +115,7 @@ void URazerFSMComponent::TickPatrol()
 
 void URazerFSMComponent::TickAttack()
 {
-	aiRazer->MoveToLocation(enemy->GetActorLocation());
+	aiRazer->MoveToLocation(FVector(enemy->GetActorLocation().X, enemy->GetActorLocation().Y, 1500.0f));
 
 	float dist = me->GetDistanceTo(enemy);
 
@@ -172,16 +172,16 @@ void URazerFSMComponent::SetRazerState(ERazerState next)
 
 void URazerFSMComponent::FireRazerBeam()
 {
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), me->beamFactory, me->GetActorLocation() + (me->GetActorUpVector() * 100.0f + me->GetActorForwardVector() * 50.0f), me->GetActorRotation());
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), me->beamFactory, me->GetActorLocation() + me->GetActorForwardVector() * 55.0f, me->GetActorRotation());
 
 	FHitResult hitResult;
 	FCollisionQueryParams params;
-	bool bHit = GetWorld()->LineTraceSingleByChannel(hitResult, me->GetActorLocation() + (me->GetActorUpVector() * 100.0f + me->GetActorForwardVector() * 50.0f), enemy->GetActorLocation(), ECollisionChannel::ECC_Visibility, params);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hitResult, me->GetActorLocation(), enemy->GetActorLocation(), ECollisionChannel::ECC_Visibility, params);
 
 	if (bHit)
 	{
 		auto target = Cast<ACloseAttackEnemy>(hitResult.GetActor());
-		//target->caEnemyFSM->OnTakeDamage();
+		target->caEnemyFSM->OnTakeDamage(30);
 	}
 }
 

@@ -26,13 +26,13 @@ ACosmicPlayer::ACosmicPlayer()
 	LeftHand->SetTrackingMotionSource(FName("Left"));
 	RightHand = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("RightHand"));
 	RightHand->SetupAttachment(RootComponent);
-	RightHand->SetTrackingMotionSource(FName("Right"));
+	RightHand->SetTrackingMotionSource(FName("Right"));	
 
 	//왼손 스켈레탈메시컴포넌트 만들기
 	LeftHandMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LeftHandMesh"));
 
 	//왼손 스켈레탈메시 로드해서 할당
-	ConstructorHelpers::FObjectFinder<USkeletalMesh>TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/MannequinsXR/Meshes/SKM_MannyXR_left.SKM_MannyXR_left'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/MannequinsXR/Meshes/SKM_MannyXR_left.SKM_MannyXR_left'"));
 	if (TempMesh.Succeeded())
 	{
 		LeftHandMesh->SetSkeletalMesh(TempMesh.Object);
@@ -68,6 +68,22 @@ ACosmicPlayer::ACosmicPlayer()
 
 	}
 
+	//던짐총을 생성하고싶다
+	ThrowGuncomp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ThrowGuncomp"));
+	//던짐총을 최상단 루트컴포넌트에 부착하고싶다
+	ThrowGuncomp->SetupAttachment(RightHandMesh);
+	//던짐총메쉬경로를 불러오고싶다.
+	ConstructorHelpers::FObjectFinder<UStaticMesh> ThrowGunMeshComp(TEXT("/Script/Engine.StaticMesh'/Game/GunMesh/free_sci-fi_gun/Cube_059_Cube_056_BASE_0.Cube_059_Cube_056_BASE_0'"));
+	//던짐총을 성공적으로 불러왔다면
+	if (ThrowGunMeshComp.Succeeded())
+	{
+		//오브젝트로 등록을 한다.
+		ThrowGuncomp->SetStaticMesh(ThrowGunMeshComp.Object);
+		ThrowGuncomp->SetRelativeLocationAndRotation(FVector(20, 20, 10), FRotator(0, -90, -90));
+		ThrowGuncomp->SetRelativeScale3D(FVector(1.3f));
+
+	}
+
 }
 
 // Called when the game starts or when spawned
@@ -90,6 +106,8 @@ void ACosmicPlayer::BeginPlay()
 	}
 
 	bullet = Cast<ABulletActor>(UGameplayStatics::GetActorOfClass(GetWorld(), bulletFactory));
+
+	ChooseGun(true);
 }
 
 // Called every frame
@@ -97,6 +115,7 @@ void ACosmicPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	Grabbing();
 }
 
 // Called to bind functionality to input
@@ -114,7 +133,39 @@ void ACosmicPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &ACosmicPlayer::OnActionFirePressed);
 
+	//기본총의 기능과 이걸눌렀을때 행동할 것을 BindAction으로 연결.
+	PlayerInputComponent->BindAction(TEXT("Grenadegun"), IE_Pressed, this, &ACosmicPlayer::OnActionGrenade);
+
+
+	//던짐총의 기능과 이걸눌렀을때 행동할 것을 BindAction으로 연결.
+	UE_LOG(LogTemp, Warning, TEXT("action"));
+	PlayerInputComponent->BindAction(TEXT("ThrowGun"), IE_Pressed, this, &ACosmicPlayer::OnActionThrowGun);
+
+
+
 	//PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &ACosmicPlayer::OnActionFireReleased);
+}
+
+
+void ACosmicPlayer::ChooseGun(bool bGrenade)
+{
+	//if(BeChooseGrenade == false && bGrenade == true)
+	BeChooseGrenade = bGrenade;
+	//이 총을 선택했을 때 어떤총(메쉬)를 보여줄것이다
+	gunMeshComp->SetVisibility(bGrenade);
+	ThrowGuncomp->SetVisibility(!bGrenade);
+
+}
+
+void ACosmicPlayer::OnActionGrenade()
+{
+	ChooseGun(true);
+}
+
+void ACosmicPlayer::OnActionThrowGun()
+{
+
+	ChooseGun(false);
 }
 
 void ACosmicPlayer::Move(const FInputActionValue& Values)
@@ -145,15 +196,6 @@ void ACosmicPlayer::Turn(const FInputActionValue& Values)
 
 void ACosmicPlayer::OnActionFirePressed()
 {
-	//Camera Shake
-	APlayerCameraManager* CSM = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
-	CSM->StartCameraShake(camShakeFactory);
-
-	if (nullptr != canShakeInstance && canShakeInstance->IsFinished() == false)
-	{
-		CSM->StopCameraShake(canShakeInstance);
-	}
-	canShakeInstance = CSM->StartCameraShake(camShakeFactory);
 
 	//타이머를 이용해서 한번클릭이후에 자동으로 생성하여 나가게하고싶다.
 	//GetWorld()->GetTimerManager().SetTimer(fireTimerHandle, this, &ACosmicPlayer::DoFire, fireInterval, true);
@@ -176,11 +218,103 @@ void ACosmicPlayer::DoFire()
 
 	//FTransform t = gunMeshComp->GetSocketTransform(TEXT("Muzzle"));
 	FTransform Trans = gunMeshComp->GetSocketTransform(FName(TEXT("FirePosition")));
-	FActorSpawnParameters Params;
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	GetWorld()->SpawnActor<ABulletActor>(bulletFactory, Trans, Params);		
+ 	FActorSpawnParameters Params;
+ 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+ 	GetWorld()->SpawnActor<ABulletActor>(bulletFactory, Trans, Params);
+}
+
+void ACosmicPlayer::TryGrab()
+{
+	//중심점
+	FVector Center = RightHand->GetComponentLocation();
+	//충돌체크해야함
+	//충돌한 물체들 기록할 배열
+	//충돌 질의 작성
+	FCollisionQueryParams Param;
+	Param.AddIgnoredActor(this);
+	Param.AddIgnoredComponent(RightHand);
+	TArray<FOverlapResult> HitObjs;
+	bool bHit = GetWorld()->OverlapMultiByChannel(HitObjs, Center, FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(GrabRange), Param);
+
+	//충돌하지 않았다면
+	if (bHit == false)
+	{
+		return;
+	}
+	//-> 가장 가까운 물체 잡도록 하자(검출과정)
+	//가장 가까운 물체 인덱스
+	int Closest = 0;
+	for (int i = 0; i < HitObjs.Num(); i++)
+	{
+		//1.물리 기능이 활성화 되어 있는 녀석만 판단
+		//->만약 부딪힌 컴포넌트가 물리기능이 비활성화 되어 있다면
+		if (HitObjs[i].GetComponent()->IsSimulatingPhysics() == false)
+		{
+			//검출하고 싶지 않다.
+			continue;
+		}
+		//잡았다!
+		IsGrabbed = true;
+
+		//2. 현재 손과 가장 가까운 녀석과 이번에 검출할 녀석과 더 가까운 녀석이 있다면
+		//->필요속성 : 현재 가장 가까운 녀석과 손과의 거리
+		float ClosestDist = FVector::Dist(HitObjs[Closest].GetActor()->GetActorLocation(), Center);
+		//->필요속성 : 이번에 검출할 녀석과 손과의 거리
+		float NextDist = FVector::Dist(HitObjs[i].GetActor()->GetActorLocation(), Center);
+		//3.만약 이번에가 현재꺼 보다 더 가깝다면
+		if (NextDist < ClosestDist)
+		{
+			// -> 가장 가까운녀석으로 변경하기
+			Closest = i;
+		}
+	}
+
+//만약 잡았다면
+	if (IsGrabbed)
+	{
+	GrabbedObject = HitObjs[Closest].GetComponent();
+	//->물체 물리기능 비활성화
+	GrabbedObject->SetSimulatePhysics(false);
+	GrabbedObject->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	 
+	//-> 손에 붙여주자
+	GrabbedObject->AttachToComponent(RightHand, FAttachmentTransformRules::KeepWorldTransform);
+
+	//프리포즈 초기값
+	PrevPos = RightHand->GetComponentLocation();
+	}
 
 }
 
+//잡은녀석이 있으면 놓고싶다.
+void ACosmicPlayer::UnTryGrab()
+{
+	if(IsGrabbed == false)
+	{
+		return;
+	}
+	//1.잡지않은 상태로 전환
+	IsGrabbed = false;
+	//2.손에서 떼어내기
+	GrabbedObject->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	//3.물리기능 활성화
+	GrabbedObject->SetSimulatePhysics(true);
+	//4.충돌기능 활성화
+	GrabbedObject->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	//던지기
+	GrabbedObject->AddForce(ThrowDirection * ThrowPower * GrabbedObject->GetMass());
+}
 
+void ACosmicPlayer::Grabbing()
+{
+	if (IsGrabbed == false)
+	{
+		return;
+	}
+	//던질방향 업데이트
+	//타겟(현재나의손위치) - me(이전에 나의 손 위치) 
+	ThrowDirection = RightHand->GetComponentLocation() - PrevPos;
 
+	//이전위치 업데이트
+	PrevPos = RightHand->GetComponentLocation();
+}
