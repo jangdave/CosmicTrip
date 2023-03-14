@@ -30,11 +30,11 @@ public:
 	class USkeletalMeshComponent* gunMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BossSettings")
-	float walkSpeed = 300.f;
+	float walkSpeed = 350.f;
 
-	class UCloseAttackEnemyFSM* bossFSM;
+	class UBossFSM* bossFSM;
 
 	UPROPERTY(EditDefaultsOnly)
-	class UCloseAttackEnemyAnim* bossAnim;
+	class UBossAnim* bossAnim;
 
 };

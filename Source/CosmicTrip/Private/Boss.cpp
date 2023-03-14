@@ -5,6 +5,8 @@
 #include "BossFSM.h"
 #include "CloseAttackEnemyAnim.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "BossAnim.h"
 
 // Sets default values
 ABoss::ABoss()
@@ -41,13 +43,15 @@ ABoss::ABoss()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	//충돌 프리셋
-	//GetMesh()->SetCollisionProfileName(TEXT("CloseAttackEnemyPreset"));
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("CloseAttackEnemyPreset"));
 }
 
 // Called when the game starts or when spawned
 void ABoss::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	auto BCAnim = Cast<UBossAnim>(GetMesh()->GetAnimInstance());
 	
 }
 
