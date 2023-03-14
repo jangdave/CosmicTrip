@@ -316,9 +316,6 @@ void ACosmicPlayer::TryGrab()
 
 }
 
-
-}
-
 //잡은녀석이 있으면 놓고싶다.
 void ACosmicPlayer::UnTryGrab()
 {
