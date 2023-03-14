@@ -67,7 +67,7 @@ void ABulletActor::BulletPower(UPrimitiveComponent* OverlappedComponent, AActor*
 		enemy->caEnemyFSM->OnTakeDamage(10);
 
 		//FVector 
-		enemy->GetActorLocation();
+		//enemy->GetActorLocation();
 	}
 }
 

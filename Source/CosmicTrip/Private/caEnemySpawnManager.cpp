@@ -25,7 +25,8 @@ void AcaEnemySpawnManager::BeginPlay()
 	
 	//int randTime = FMath::RandRange(minTime, maxTime);
 	GetWorldTimerManager().SetTimer(timerHandlespawncaEnemy, this, &AcaEnemySpawnManager::SpawnEnemy, 1);
-	UE_LOG(LogTemp, Error, TEXT("AcaEnemySpawnManager::BeginPlay()"))
+	//UE_LOG(LogTemp, Error, TEXT("AcaEnemySpawnManager::BeginPlay()"))
+	auto enmey = Cast<ACloseAttackEnemy>(UGameplayStatics::GetActorOfClass(GetWorld(), caEnemyFactory));
 }
 
 // Called every frame
@@ -52,7 +53,7 @@ void AcaEnemySpawnManager::SpawnEnemy()
 	int randomTime = FMath::RandRange(minTime, maxTime);
 	GetWorldTimerManager().SetTimer(timerHandlespawncaEnemy, this, &AcaEnemySpawnManager::SpawnEnemy, randomTime);
 
-	UE_LOG(LogTemp, Warning, TEXT("AcaEnemySpawnManager::SpawnEnemy()"))
+	//UE_LOG(LogTemp, Warning, TEXT("AcaEnemySpawnManager::SpawnEnemy()"))
 
 }
 

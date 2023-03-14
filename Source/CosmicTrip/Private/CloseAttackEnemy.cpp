@@ -5,6 +5,7 @@
 #include "CloseAttackEnemyFSM.h"
 #include "CloseAttackEnemyAnim.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 
 // Sets default values
@@ -30,18 +31,19 @@ ACloseAttackEnemy::ACloseAttackEnemy()
 	
 	caEnemyFSM = CreateDefaultSubobject<UCloseAttackEnemyFSM>(TEXT("caEnemyFSM"));
 
-	gunMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMesh"));
-	gunMesh->SetupAttachment(GetMesh());
+	gunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("gunMesh"));
+	gunMesh->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempgunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/FPWeapon/Mesh/SK_FPGun.SK_FPGun'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempgunMesh(TEXT("/Script/Engine.StaticMesh'/Game/CosmicVR/Assets/Enemy/EnemyHammer/scene.scene'"));
 	if (tempgunMesh.Succeeded())
 	{
-		gunMesh->SetSkeletalMesh(tempgunMesh.Object);
-		gunMesh->SetRelativeLocationAndRotation(FVector(30, 30, 120), FRotator(0, 0, 0));
+		gunMesh->SetStaticMesh(tempgunMesh.Object);
+		gunMesh->SetRelativeLocationAndRotation(FVector(-8, 6, -20), FRotator(0, 180, 0));
+		gunMesh->SetRelativeScale3D(FVector(0.2f));
 	}
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-	GetMesh()->SetCollisionProfileName(TEXT("CloseAttackEnemyPreset"));
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("CloseAttackEnemyPreset"));
 	
 }
 
@@ -52,9 +54,6 @@ void ACloseAttackEnemy::BeginPlay()
 
 	caEnemyAnim = Cast<UCloseAttackEnemyAnim>(GetMesh()->GetAnimInstance());
 	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
-
-	
-
 	
 }
 

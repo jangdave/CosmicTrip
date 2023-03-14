@@ -9,6 +9,8 @@
 #include <MotionControllerComponent.h>
 #include "Kismet/GameplayStatics.h"
 #include "BulletActor.h"
+#include "Components/WidgetInteractionComponent.h"
+#include "PlayerItemWidget.h"
 
 // Sets default values
 ACosmicPlayer::ACosmicPlayer()
@@ -84,6 +86,12 @@ ACosmicPlayer::ACosmicPlayer()
 
 	}
 
+	//Item Widget
+	itemWidget = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("itemWidget"));
+	itemWidget->SetupAttachment(VRCamera);
+	
+
+
 }
 
 // Called when the game starts or when spawned
@@ -116,6 +124,7 @@ void ACosmicPlayer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	Grabbing();
+
 }
 
 // Called to bind functionality to input
@@ -317,4 +326,16 @@ void ACosmicPlayer::Grabbing()
 
 	//이전위치 업데이트
 	PrevPos = RightHand->GetComponentLocation();
+}
+
+void ACosmicPlayer::OpenItemWidget()
+{
+	//vr카메라의 get actor location에 일정 거리 떨어진 위치에 뜨도록 계산한다
+	FVector startpos = VRCamera->GetComponentLocation();
+	FVector widgetpos = startpos + VRCamera->GetForwardVector() * 500;
+
+	//GetWorld()->SpawnActor<>()
+	//얘를 띄울지 말지 결정하는 bool변수에 만들어놓고
+	//키 바인딩 하고
+	
 }
