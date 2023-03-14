@@ -173,4 +173,13 @@ public:
 	//잡고있는중
 	void Grabbing();
 
+public:
+	//Player Item Widget
+	UPROPERTY(EditDefaultsOnly, Category = "Widget")
+	class UWidgetInteractionComponent* itemWidget;
+
+	//UI 띄우기
+	UFUNCTION()
+	void OpenItemWidget();
+
 };

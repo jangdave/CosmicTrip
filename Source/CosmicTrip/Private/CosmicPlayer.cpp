@@ -13,6 +13,9 @@
 
 #define PRINTToScreen(msg) UE_LOG(LogTemp, Warning, TEXT("%s"), *msg)
 
+#include "Components/WidgetInteractionComponent.h"
+#include "PlayerItemWidget.h"
+
 // Sets default values
 ACosmicPlayer::ACosmicPlayer()
 {
@@ -86,6 +89,7 @@ ACosmicPlayer::ACosmicPlayer()
 		ThrowGuncomp->SetRelativeScale3D(FVector(1.3f));
 
 	}
+
 	//소리를 넣고싶다
 	GunFireSound = CreateDefaultSubobject<USoundBase>(TEXT("GunFireSound"));
 	ConstructorHelpers::FObjectFinder<USoundBase> fireSound(TEXT("/Script/Engine.SoundWave'/Game/CosmicVR/Sound/Sound_Ddock_cutegun_.Sound_Ddock_cutegun_'"));
@@ -93,6 +97,13 @@ ACosmicPlayer::ACosmicPlayer()
 	{
 		GunFireSound = (fireSound.Object);
 	}
+
+	//Item Widget
+	itemWidget = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("itemWidget"));
+	itemWidget->SetupAttachment(VRCamera);
+	
+
+
 }
 
 
@@ -126,6 +137,7 @@ void ACosmicPlayer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	Grabbing();
+
 }
 
 // Called to bind functionality to input
@@ -304,6 +316,9 @@ void ACosmicPlayer::TryGrab()
 
 }
 
+
+}
+
 //잡은녀석이 있으면 놓고싶다.
 void ACosmicPlayer::UnTryGrab()
 {
@@ -335,4 +350,16 @@ void ACosmicPlayer::Grabbing()
 
 	//이전위치 업데이트
 	PrevPos = RightHand->GetComponentLocation();
+}
+
+void ACosmicPlayer::OpenItemWidget()
+{
+	//vr카메라의 get actor location에 일정 거리 떨어진 위치에 뜨도록 계산한다
+	FVector startpos = VRCamera->GetComponentLocation();
+	FVector widgetpos = startpos + VRCamera->GetForwardVector() * 500;
+
+	//GetWorld()->SpawnActor<>()
+	//얘를 띄울지 말지 결정하는 bool변수에 만들어놓고
+	//키 바인딩 하고
+	
 }

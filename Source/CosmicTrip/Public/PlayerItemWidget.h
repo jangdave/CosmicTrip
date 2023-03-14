@@ -13,5 +13,7 @@ UCLASS()
 class COSMICTRIP_API UPlayerItemWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+
 	
 };

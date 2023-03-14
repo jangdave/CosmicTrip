@@ -104,8 +104,12 @@ void UCloseAttackEnemyFSM::TickMove()
 	targetDist = me->GetDistanceTo(mainTarget);
 
 	//플레이어를 공격할 범위 안에 들어왔다면 플레이어 공격 상태로 전환
-	if (targetDist <= attackRange && bAttackAnimPlay != true)
+	if (targetDist <= attackRange)
 	{
+// 		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));
+// 		me->caEnemyAnim->bChangeMove = false;
+// 		me->GetCharacterMovement()->MaxWalkSpeed = 0;
+// 		bAttackAnimPlay = true;
 		SetState(EEnemyState::ATTACK);		
 	}
 
@@ -141,35 +145,37 @@ void UCloseAttackEnemyFSM::TickMoveToRobot()
 //플레이어를 공격
 void UCloseAttackEnemyFSM::TickAttack()
 {
-	//일정 시간이 지나면
+	if (bAttackAnimPlay != true)
+	{
+		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));
+		me->caEnemyAnim->bChangeMove = false;
+		me->GetCharacterMovement()->MaxWalkSpeed = 0;
+		bAttackAnimPlay = true;
+	}
+	
+	/*//일정 시간이 지나면
 	currentTime += GetWorld()->GetDeltaSeconds();
 
 	//일정 시간에 한번씩 공격하기
 	if (currentTime >= attackDelayTime)
 	{	
 		//공격 montage 호출
-		//me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));
-		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));
-		me->caEnemyAnim->bChangeMove = false;
-		me->GetCharacterMovement()->MaxWalkSpeed = 0;
-		bAttackAnimPlay = true;
+		//me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));		
 		currentTime = 0;
 
-// 		bAttackPlay = false;
-// 		else
-// 		{
-// 
-// 			me->caEnemyAnim->bAttackPlay = true;
-// 		}
-
-	}
+ 		bAttackPlay = false;
+		else
+ 		{ 
+ 			me->caEnemyAnim->bAttackPlay = true;
+ 		}
+	} 
 	//공격범위를 벗어나면 move로 전환
 	targetDist = mainTarget->GetDistanceTo(me);
 
 	if (targetDist > attackRange)
 	{
 		SetState(EEnemyState::MOVE);
-	}
+	}*/
 
 }
 
