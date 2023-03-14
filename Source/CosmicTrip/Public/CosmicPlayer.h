@@ -133,7 +133,11 @@ public:
 	//폭팔공장
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* bulletImpactFactory;
-	
+
+	//사운드
+	UPROPERTY(VisibleAnyWhere, Category = "Sound")
+	class USoundBase* GunFireSound;
+
 	//잡기버튼을 누르면 물체를 잡고 싶다.
 	//필요속성: 입력액션
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -165,8 +169,8 @@ public:
 	//잡기시도 기능
 	void TryGrab();
 	//놓기
-	//void UnTryGrab();
+	void UnTryGrab();
 	//잡고있는중
-	//void Grabbing();
+	void Grabbing();
 
 };

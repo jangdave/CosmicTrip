@@ -9,6 +9,7 @@
 #include <MotionControllerComponent.h>
 #include "Kismet/GameplayStatics.h"
 #include "BulletActor.h"
+#include <Sound/SoundBase.h>
 
 #define PRINTToScreen(msg) UE_LOG(LogTemp, Warning, TEXT("%s"), *msg)
 
@@ -67,6 +68,7 @@ ACosmicPlayer::ACosmicPlayer()
 		gunMeshComp->SetSkeletalMesh(GunMesh.Object);
 		gunMeshComp->SetRelativeLocationAndRotation(FVector(3.8f, 5.0f, -10.6f), FRotator(-5, -90, 55));
 		gunMeshComp->SetRelativeScale3D(FVector(0.5f));
+
 	}
 
 	//던짐총을 생성하고싶다
@@ -82,8 +84,17 @@ ACosmicPlayer::ACosmicPlayer()
 		ThrowGuncomp->SetStaticMesh(ThrowGunMeshComp.Object);
 		ThrowGuncomp->SetRelativeLocationAndRotation(FVector(2, 8, -6), FRotator(-40, 180, 14));
 		ThrowGuncomp->SetRelativeScale3D(FVector(1.3f));
+
+	}
+	//소리를 넣고싶다
+	GunFireSound = CreateDefaultSubobject<USoundBase>(TEXT("GunFireSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> fireSound(TEXT("/Script/Engine.SoundWave'/Game/CosmicVR/Sound/Sound_Ddock_cutegun_.Sound_Ddock_cutegun_'"));
+	if (fireSound.Succeeded())
+	{
+		GunFireSound = (fireSound.Object);
 	}
 }
+
 
 // Called when the game starts or when spawned
 void ACosmicPlayer::BeginPlay()
@@ -101,6 +112,7 @@ void ACosmicPlayer::BeginPlay()
 		{
 			subSystem->AddMappingContext(IMC_VRInput, 0);
 		}
+
 	}
 
 	bullet = Cast<ABulletActor>(UGameplayStatics::GetActorOfClass(GetWorld(), bulletFactory));
@@ -112,7 +124,8 @@ void ACosmicPlayer::BeginPlay()
 void ACosmicPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
+	Grabbing();
 }
 
 // Called to bind functionality to input
@@ -140,6 +153,7 @@ void ACosmicPlayer::ChooseGun(bool bGrenade)
 	//이 총을 선택했을 때 어떤총(메쉬)를 보여줄것이다
 	gunMeshComp->SetVisibility(bGrenade);
 	ThrowGuncomp->SetVisibility(!bGrenade);
+
 }
 
 void ACosmicPlayer::OnActionGrenade()
@@ -180,20 +194,25 @@ void ACosmicPlayer::Turn(const FInputActionValue& Values)
 
 void ACosmicPlayer::OnActionFirePressed()
 {
+
 	//타이머를 이용해서 한번클릭이후에 자동으로 생성하여 나가게하고싶다.
 	//GetWorld()->GetTimerManager().SetTimer(fireTimerHandle, this, &ACosmicPlayer::DoFire, fireInterval, true);
+
 
 	//만약 기본총(그랜에이드건)이라면
 	// gunMeshComp 가 있다면
 	if(BeChooseGrenade)
 	{
 		DoFire();
+		UGameplayStatics::PlaySoundAtLocation(this, GunFireSound, GetActorLocation(), GetActorRotation());
 	}
 	//그렇지않다면(던짐총)
 	else
 	{
+
 		//물건을 잡고싶다.
 		TryGrab();
+
 	}
 }
 
@@ -205,15 +224,6 @@ void ACosmicPlayer::OnActionFireReleased()
 
 void ACosmicPlayer::DoFire()
 {
-	APlayerCameraManager* CSM = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
-	CSM->StartCameraShake(camShakeFactory);
-
-	if (nullptr != canShakeInstance && canShakeInstance->IsFinished() == false)
-	{
-		CSM->StopCameraShake(canShakeInstance);
-	}
-	canShakeInstance = CSM->StartCameraShake(camShakeFactory);
-
 	//SpawnActor
 	//UGamePlayStatics , UKismetMathLibrary, GetWorld, 구글등에서 찾아보기
 	//플레이어 1M앞
@@ -294,7 +304,7 @@ void ACosmicPlayer::TryGrab()
 
 }
 
-/*/잡은녀석이 있으면 놓고싶다.
+//잡은녀석이 있으면 놓고싶다.
 void ACosmicPlayer::UnTryGrab()
 {
 	if(IsGrabbed == false)
@@ -325,4 +335,4 @@ void ACosmicPlayer::Grabbing()
 
 	//이전위치 업데이트
 	PrevPos = RightHand->GetComponentLocation();
-}*/
+}
