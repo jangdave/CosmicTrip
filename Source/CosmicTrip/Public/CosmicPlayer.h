@@ -100,7 +100,7 @@ public:
 public:
 	
 	//Ä«¸Þ¶ó
-	UPROPERTY(VisibleAnywhere, Category = "VRCamera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VRCamera")
 	class UCameraComponent* VRCamera;
 	
 	//CameraShake
