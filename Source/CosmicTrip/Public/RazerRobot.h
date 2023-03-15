@@ -31,5 +31,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	class UParticleSystem* beamFactory;
-
 };

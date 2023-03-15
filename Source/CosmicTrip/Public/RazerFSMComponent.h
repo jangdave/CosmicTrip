@@ -35,10 +35,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	ERazerState razerState;
-
-	UPROPERTY()
-	class ACloseAttackEnemy* enemy;
-
+	
 	UPROPERTY()
 	class ARazerRobot* me;
 
@@ -66,10 +63,8 @@ public:
 
 	void FireRazerBeam();
 
-	bool bCheckFirst = true;
-
-	bool bCheckEmitter = false;
-
+	void OnOverlap();
+	
 	UPROPERTY(EditDefaultsOnly, Category = "circle")
 	FVector dimensions = FVector(300, 0, 0);
 
@@ -80,4 +75,15 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "circle")
 	float multiplier = 1.0f;
+
+	UPROPERTY()
+	TArray<AActor*> enemis;
+	
+	bool bOverlapEnemy;
+
+	float curTime;
+
+	float reTime = 5;
+
+	bool bCheckFire;
 };

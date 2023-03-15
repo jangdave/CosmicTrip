@@ -2,13 +2,13 @@
 
 
 #include "RazerFSMComponent.h"
-#include "AIController.h"
 #include "CloseAttackEnemy.h"
 #include "CloseAttackEnemyFSM.h"
 #include "CosmicPlayer.h"
 #include "RazerRobot.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values for this component's properties
 URazerFSMComponent::URazerFSMComponent()
@@ -27,12 +27,12 @@ void URazerFSMComponent::BeginPlay()
 	Super::BeginPlay();
 
 	me = Cast<ARazerRobot>(GetOwner());
-
-	aiRazer = Cast<AAIController>(me->GetController());
-
+	
 	player = Cast<ACosmicPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	SetRazerState(ERazerState::IDLE);
+
+	me->GetCharacterMovement()->MaxFlySpeed = 200.0f;
 }
 
 
@@ -66,7 +66,7 @@ void URazerFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 void URazerFSMComponent::TickIdle()
 {
-	if (player)
+	if (player !=nullptr)
 	{
 		SetRazerState(ERazerState::MOVE);
 	}
@@ -74,19 +74,28 @@ void URazerFSMComponent::TickIdle()
 
 void URazerFSMComponent::TickMove()
 {
-	aiRazer->MoveToLocation(FVector(player->GetActorLocation().X, player->GetActorLocation().Y, 1500.0f));
-	
+	FVector start = me->GetActorLocation();
+
+	FVector target = player->GetActorLocation() + FVector(0, 0, 150.0f);
+
+	FRotator rot = UKismetMathLibrary::FindLookAtRotation(start, target);
+
+	FVector targetloc = UKismetMathLibrary::Conv_RotatorToVector(FRotator(0, rot.Yaw, 0));
+
+	me->AddMovementInput(targetloc);
+
 	float dist = me->GetDistanceTo(player);
 
-	if (dist < 500.0f)
+	if (dist < 300.0f)
 	{
+		me->GetCharacterMovement()->MaxFlySpeed = 0;
 		SetRazerState(ERazerState::PATROL);
 	}
 }
 
 void URazerFSMComponent::TickPatrol()
 {
-	FVector newLocation = FVector(player->GetActorLocation().X, player->GetActorLocation().Y, 1500.0f);
+	/*FVector newLocation = FVector(player->GetActorLocation().X, player->GetActorLocation().Y, 1500.0f);
 	
 	angleAxis+= multiplier;
 
@@ -101,57 +110,75 @@ void URazerFSMComponent::TickPatrol()
 	newLocation.Y += rotateValue.Y;
 	newLocation.Z += rotateValue.Z;
 
-	aiRazer->MoveToLocation(newLocation);
+	->MoveToLocation(newLocation);*/
 
-	enemy = Cast<ACloseAttackEnemy>(UGameplayStatics::GetActorOfClass(GetWorld(), ACloseAttackEnemy::StaticClass()));
+	OnOverlap();
 
-	float dist = me->GetDistanceTo(enemy);
-
-	if (dist < 1000.0f && enemy != nullptr)
+	if (bOverlapEnemy != false)
 	{
+		me->GetCharacterMovement()->MaxFlySpeed = 200.0f;
 		SetRazerState(ERazerState::ATTACK);
+	}
+	else
+	{
+		me->GetCharacterMovement()->MaxFlySpeed = 200.0f;
+		SetRazerState(ERazerState::IDLE);
 	}
 }
 
 void URazerFSMComponent::TickAttack()
 {
-	aiRazer->MoveToLocation(FVector(enemy->GetActorLocation().X, enemy->GetActorLocation().Y, 1500.0f));
+	FVector target = enemis[0]->GetActorLocation() + FVector(0, 0, 150.0f);
 
-	float dist = me->GetDistanceTo(enemy);
+	FVector start = me->GetActorLocation();
 
-	if (dist < 500.0f)
+	FRotator rot = UKismetMathLibrary::FindLookAtRotation(start, target);
+
+	FVector targetloc = UKismetMathLibrary::Conv_RotatorToVector(FRotator(0, rot.Yaw, 0));
+
+	me->AddMovementInput(targetloc);
+
+	float dist = me->GetDistanceTo(enemis[0]);
+
+	if (dist < 300.0f)
 	{
 		SetRazerState(ERazerState::DAMAGE);
-	}
-	if (enemy == nullptr)
-	{
-		SetRazerState(ERazerState::PATROL);
 	}
 }
 
 void URazerFSMComponent::TickDamage()
 {
-	me->GetCharacterMovement()->MaxWalkSpeed = 0;
+	if (enemis[0]->Destroy())
+	{
+		me->SetActorRotation(FRotator::ZeroRotator);
+		me->GetCharacterMovement()->MaxFlySpeed = 200;
+		SetRazerState(ERazerState::IDLE);
+	}
 
-	if (bCheckEmitter != true)
+	me->GetCharacterMovement()->MaxFlySpeed = 0;
+
+	FVector lookDist = enemis[0]->GetActorLocation() - me->GetActorLocation();
+
+	FRotator lookRot = FRotationMatrix::MakeFromX(lookDist).Rotator();
+
+	me->SetActorRotation(FMath::Lerp(me->GetActorRotation(), lookRot, 0.1f));
+
+	curTime += GetWorld()->GetDeltaSeconds();
+		
+	if (curTime > reTime || bCheckFire != true)
 	{
 		FireRazerBeam();
-		bCheckEmitter = true;
+		curTime = 0;
+		bCheckFire = true;
 	}
 
-	float dist = me->GetDistanceTo(enemy);
+	float dist = me->GetDistanceTo(enemis[0]);
 
-	if (dist > 600.0f)
+	if (dist > 400.0f)
 	{
-		me->GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+		me->SetActorRotation(FRotator::ZeroRotator);
+		me->GetCharacterMovement()->MaxFlySpeed = 200.0f;
 		SetRazerState(ERazerState::ATTACK);
-		bCheckEmitter = false;
-	}
-	if (enemy == nullptr)
-	{
-		me->GetCharacterMovement()->MaxWalkSpeed = 400.0f;
-		SetRazerState(ERazerState::PATROL);
-		bCheckEmitter = false;
 	}
 }
 
@@ -176,12 +203,31 @@ void URazerFSMComponent::FireRazerBeam()
 
 	FHitResult hitResult;
 	FCollisionQueryParams params;
-	bool bHit = GetWorld()->LineTraceSingleByChannel(hitResult, me->GetActorLocation(), enemy->GetActorLocation(), ECollisionChannel::ECC_Visibility, params);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hitResult, me->GetActorLocation(), enemis[0]->GetActorLocation(), ECollisionChannel::ECC_Visibility, params);
 
 	if (bHit)
 	{
 		auto target = Cast<ACloseAttackEnemy>(hitResult.GetActor());
-		target->caEnemyFSM->OnTakeDamage(30);
+		target->caEnemyFSM->OnTakeDamage(10);
+	}
+}
+
+void URazerFSMComponent::OnOverlap()
+{
+	TArray<FOverlapResult> oversInfo;
+	FVector loc = me->GetActorLocation();
+	FQuat rot = me->GetActorRotation().Quaternion();
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(me);
+	params.AddIgnoredActor(player);
+
+	bOverlapEnemy = GetWorld()->OverlapMultiByChannel(oversInfo, loc, rot, ECC_Visibility, FCollisionShape::MakeSphere(1000), params);
+
+	for (FOverlapResult overInfo : oversInfo)
+	{
+		auto enemy = Cast<ACloseAttackEnemy>(overInfo.GetActor());
+
+		enemis.Add(enemy);
 	}
 }
 
