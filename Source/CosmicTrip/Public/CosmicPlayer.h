@@ -36,6 +36,9 @@ public:
 	class UInputMappingContext* IMC_VRInput;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputMappingContext* IMC_Hand;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Move;
 		
 	// 총쏘기
@@ -48,17 +51,12 @@ public:
 
 	//인풋 기본총
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-		class UInputAction* IA_Grenade;
-
-	//던짐총선택하기
-	//void 리턴값이 없는 함수만들때 자료형임
-	//void ThrowGun();
-
+	class UInputAction* IA_Grenade;
+	
 	//어떤총을 선택할지에 대한 함수
 	void ChooseGun(bool bGrenade);
 
 	//어떤총을 선택했는지 저장하는 변수
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool BeChooseGrenade;
 
 	//기본총을 선택할것이다
@@ -67,11 +65,8 @@ public:
 	//던짐총을 선택할것이다
 	void OnActionThrowGun();
 
-
 	//사용할 이동처리함수
 	void Move(const FInputActionValue& Values);
-
-	//마우스 입력처리
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Mouse;
@@ -79,26 +74,19 @@ public:
 	//회전처리 함수
 	void Turn(const FInputActionValue& Values);
 
-
-	//1번키와 2번키에대한 (총교체)입력처리를 하고싶다.
 	void OnActionFirePressed();
-	void OnActionFireReleased();
+
 	//총쏘기 기능
 	void DoFire();
 
-	//던짐총 스태틱메시 추가
 	UPROPERTY(VisibleAnywhere, Category = ThrowGunMesh)
 	class UStaticMeshComponent* ThrowGuncomp;
 
-	//마우스 왼쪽버튼을 누르면 총알공장에서 총알을 만들어서 총구위치에 배치하고싶다.
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABulletActor> bulletFactory;
 
 	class ABulletActor* bullet;                   
 
-
-public:
-	
 	//카메라
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VRCamera")
 	class UCameraComponent* VRCamera;
@@ -113,14 +101,19 @@ public:
 	//컨트롤러 
 	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
 	class UMotionControllerComponent* LeftHand;
+
 	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
 	class UMotionControllerComponent* RightHand;
 
 	//사용할 손 모델
-	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = "MotionController")
 	class USkeletalMeshComponent* LeftHandMesh;
-	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
+
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = "MotionController")
 	class USkeletalMeshComponent* RightHandMesh;
+
+	UPROPERTY(VisibleAnywhere, Category = "MotionController")
+	class UMotionControllerComponent* RightAim;
 
 	//총을 생성한다.
 	UPROPERTY(VisibleAnyWhere, Category = "MotionController")
@@ -128,11 +121,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float fireInterval = 0.5f;
-	FTimerHandle fireTimerHandle;
 
-	//폭팔공장
-	UPROPERTY(EditAnywhere)
-	class UNiagaraSystem* bulletImpactFactory;
+	FTimerHandle fireTimerHandle;
 
 	//사운드
 	UPROPERTY(VisibleAnyWhere, Category = "Sound")
@@ -147,9 +137,6 @@ public:
  	UPROPERTY(EditDefaultsOnly, Category = "Grab")
 	float GrabRange =100;
 
-	//잡은물체를 기억하자
-	//메모리관리를 위해서 UPROPERTY라는 스마트 포인터를 
-	//사용해주는게 좋다. 
 	UPROPERTY()
 	class UPrimitiveComponent* GrabbedObject;
 
@@ -159,6 +146,7 @@ public:
 	//던지면 원하는 방향으로 날아가도록 하고싶다.
 	//던질 방향
 	FVector ThrowDirection;
+
 	//던질 힘
 	UPROPERTY(EditAnywhere, Category = "Grab")
 	float ThrowPower = 1000;
@@ -168,13 +156,13 @@ public:
 
 	//잡기시도 기능
 	void TryGrab();
+
 	//놓기
 	void UnTryGrab();
+
 	//잡고있는중
 	void Grabbing();
 
-public:
-	//Player Item Widget
 	UPROPERTY(EditDefaultsOnly, Category = "Widget")
 	class UWidgetInteractionComponent* itemWidget;
 
