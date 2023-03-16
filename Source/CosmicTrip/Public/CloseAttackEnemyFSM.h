@@ -65,6 +65,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
 	float acceptanceRadius = 5;
 
+	//시간체크
 	float currentTime = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -80,7 +81,7 @@ public:
 	bool bDeathAnimPlay;
 
 	//enemy가 찾아갈 목적지
-	FVector wantedLocation; 		
+	FVector wantedLocation; 
 	
 
 	//랜덤한 위치
@@ -105,6 +106,6 @@ private:
 	void TickAttack();
 	void TickAttackRobot();
 //	void TickDamage();
-	void TickDie();	
+//	void TickDie();	
 	void TickMoveToRobot();
 };

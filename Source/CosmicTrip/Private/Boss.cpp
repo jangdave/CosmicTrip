@@ -5,6 +5,8 @@
 #include "BossFSM.h"
 #include "CloseAttackEnemyAnim.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ABoss::ABoss()
@@ -19,6 +21,7 @@ ABoss::ABoss()
 	{
 		GetMesh()->SetSkeletalMesh(tempcaMesh.Object);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+		GetMesh()->SetRelativeScale3D(FVector(1.6f));
 	}
 
 	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnim(TEXT("/Script/Engine.AnimBlueprint'/Game/CosmicVR/BossEnemy/Animation/ABP_BossFSM.ABP_BossFSM_C'"));
@@ -27,7 +30,7 @@ ABoss::ABoss()
 		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
 	}
 
-	bossFSM = CreateDefaultSubobject<UCloseAttackEnemyFSM>(TEXT("BossFSM"));
+	bossFSM = CreateDefaultSubobject<UBossFSM>(TEXT("BossFSM"));
 
 	gunMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMesh"));
 	gunMesh->SetupAttachment(GetMesh());
@@ -41,7 +44,7 @@ ABoss::ABoss()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	//충돌 프리셋
-	//GetMesh()->SetCollisionProfileName(TEXT("CloseAttackEnemyPreset"));
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("CloseAttackEnemyPreset"));
 }
 
 // Called when the game starts or when spawned
@@ -49,6 +52,19 @@ void ABoss::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ABoss::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	auto GI = UGameplayStatics::GetGameInstance(GetWorld());
+	USkeletalMeshComponent* TempMesh = GetMesh();
+	if (GI == nullptr)
+	{
+		return;
+	}
+	GetCharacterMovement()->MaxWalkSpeed = bossFSM->walkSpeed;
 }
 
 // Called every frame
@@ -62,6 +78,8 @@ void ABoss::Tick(float DeltaTime)
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+
 
 }
 
