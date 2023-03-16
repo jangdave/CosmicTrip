@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Robot.h"
+#include "NiagaraComponent.h"
 #include "RazerRobot.generated.h"
 
 /**
@@ -29,6 +30,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "FSM")
 	class URazerFSMComponent* razerFSM;
 
-	UPROPERTY(EditDefaultsOnly)
-	class UParticleSystem* beamFactory;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
+	class UNiagaraSystem* fireEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
+	UNiagaraComponent* niagaraFireComp;
+
+	UFUNCTION()
+	void StartFire();
 };

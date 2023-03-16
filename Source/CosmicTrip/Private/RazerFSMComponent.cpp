@@ -5,6 +5,7 @@
 #include "CloseAttackEnemy.h"
 #include "CloseAttackEnemyFSM.h"
 #include "CosmicPlayer.h"
+#include "EditorCategoryUtils.h"
 #include "RazerRobot.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -86,7 +87,7 @@ void URazerFSMComponent::TickMove()
 
 	float dist = me->GetDistanceTo(player);
 
-	if (dist < 300.0f)
+	if (dist < 400.0f)
 	{
 		me->GetCharacterMovement()->MaxFlySpeed = 0;
 		SetRazerState(ERazerState::PATROL);
@@ -114,7 +115,7 @@ void URazerFSMComponent::TickPatrol()
 
 	OnOverlap();
 
-	if (bOverlapEnemy != false)
+	if (bOverlapEnemy != false && IsValid(enemis[0]))
 	{
 		me->GetCharacterMovement()->MaxFlySpeed = 200.0f;
 		SetRazerState(ERazerState::ATTACK);
@@ -132,15 +133,15 @@ void URazerFSMComponent::TickAttack()
 
 	FVector start = me->GetActorLocation();
 
-	FRotator rot = UKismetMathLibrary::FindLookAtRotation(start, target);
+	FRotator lookRot = UKismetMathLibrary::FindLookAtRotation(start, target);
 
-	FVector targetloc = UKismetMathLibrary::Conv_RotatorToVector(FRotator(0, rot.Yaw, 0));
+	FVector targetloc = UKismetMathLibrary::Conv_RotatorToVector(FRotator(0, lookRot.Yaw, 0));
 
 	me->AddMovementInput(targetloc);
 
 	float dist = me->GetDistanceTo(enemis[0]);
 
-	if (dist < 300.0f)
+	if (dist < 600.0f)
 	{
 		SetRazerState(ERazerState::DAMAGE);
 	}
@@ -148,13 +149,6 @@ void URazerFSMComponent::TickAttack()
 
 void URazerFSMComponent::TickDamage()
 {
-	if (enemis[0]->Destroy())
-	{
-		me->SetActorRotation(FRotator::ZeroRotator);
-		me->GetCharacterMovement()->MaxFlySpeed = 200;
-		SetRazerState(ERazerState::IDLE);
-	}
-
 	me->GetCharacterMovement()->MaxFlySpeed = 0;
 
 	FVector lookDist = enemis[0]->GetActorLocation() - me->GetActorLocation();
@@ -164,21 +158,19 @@ void URazerFSMComponent::TickDamage()
 	me->SetActorRotation(FMath::Lerp(me->GetActorRotation(), lookRot, 0.1f));
 
 	curTime += GetWorld()->GetDeltaSeconds();
-		
+	
 	if (curTime > reTime || bCheckFire != true)
 	{
-		FireRazerBeam();
+		me->StartFire();
 		curTime = 0;
 		bCheckFire = true;
 	}
 
-	float dist = me->GetDistanceTo(enemis[0]);
-
-	if (dist > 400.0f)
+	if (enemis[0] == nullptr || !IsValid(enemis[0]))
 	{
 		me->SetActorRotation(FRotator::ZeroRotator);
-		me->GetCharacterMovement()->MaxFlySpeed = 200.0f;
-		SetRazerState(ERazerState::ATTACK);
+		me->GetCharacterMovement()->MaxFlySpeed = 200;
+		SetRazerState(ERazerState::IDLE);
 	}
 }
 
@@ -197,21 +189,6 @@ void URazerFSMComponent::SetRazerState(ERazerState next)
 	razerState = next;
 }
 
-void URazerFSMComponent::FireRazerBeam()
-{
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), me->beamFactory, me->GetActorLocation() + me->GetActorForwardVector() * 55.0f, me->GetActorRotation());
-
-	FHitResult hitResult;
-	FCollisionQueryParams params;
-	bool bHit = GetWorld()->LineTraceSingleByChannel(hitResult, me->GetActorLocation(), enemis[0]->GetActorLocation(), ECollisionChannel::ECC_Visibility, params);
-
-	if (bHit)
-	{
-		auto target = Cast<ACloseAttackEnemy>(hitResult.GetActor());
-		target->caEnemyFSM->OnTakeDamage(10);
-	}
-}
-
 void URazerFSMComponent::OnOverlap()
 {
 	TArray<FOverlapResult> oversInfo;
@@ -223,11 +200,17 @@ void URazerFSMComponent::OnOverlap()
 
 	bOverlapEnemy = GetWorld()->OverlapMultiByChannel(oversInfo, loc, rot, ECC_Visibility, FCollisionShape::MakeSphere(1000), params);
 
-	for (FOverlapResult overInfo : oversInfo)
+	//for (FOverlapResult overInfo : oversInfo)
+	//{
+	//	auto enemy = Cast<ACloseAttackEnemy>(overInfo.GetActor());
+
+	//	enemis.Add(enemy);
+	//}
+
+	for (int i = 0; i<oversInfo.Num(); i++)
 	{
-		auto enemy = Cast<ACloseAttackEnemy>(overInfo.GetActor());
+		auto enemy = Cast<ACloseAttackEnemy>(oversInfo[i].GetActor());
 
 		enemis.Add(enemy);
 	}
 }
-

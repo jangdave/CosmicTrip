@@ -76,7 +76,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "circle")
 	float multiplier = 1.0f;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TArray<AActor*> enemis;
 	
 	bool bOverlapEnemy;
@@ -86,4 +86,6 @@ public:
 	float reTime = 5;
 
 	bool bCheckFire;
+
+	float z = 150.0f;
 };
