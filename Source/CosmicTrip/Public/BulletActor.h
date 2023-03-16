@@ -33,6 +33,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* movementComp;
 
+	
+
 	UFUNCTION() //언리얼에서 인식할수있는 형식
 	void OnDie();
 

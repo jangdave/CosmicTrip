@@ -9,6 +9,11 @@
 #include <MotionControllerComponent.h>
 #include "Kismet/GameplayStatics.h"
 #include "BulletActor.h"
+#include <Sound/SoundBase.h>
+#include "HeadMountedDisplayFunctionLibrary.h"
+#include "IHeadMountedDisplay.h"
+#include "Components/WidgetInteractionComponent.h"
+#include "PlayerItemWidget.h"
 
 // Sets default values
 ACosmicPlayer::ACosmicPlayer()
@@ -20,39 +25,39 @@ ACosmicPlayer::ACosmicPlayer()
 	VRCamera->SetupAttachment(RootComponent);
 	VRCamera->bUsePawnControlRotation = true;
 
-	//손추가
 	LeftHand = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("LeftHand"));
 	LeftHand->SetupAttachment(RootComponent);
 	LeftHand->SetTrackingMotionSource(FName("Left"));
+
 	RightHand = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("RightHand"));
 	RightHand->SetupAttachment(RootComponent);
 	RightHand->SetTrackingMotionSource(FName("Right"));	
 
-	//왼손 스켈레탈메시컴포넌트 만들기
 	LeftHandMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LeftHandMesh"));
+	LeftHandMesh->SetupAttachment(LeftHand);
 
-	//왼손 스켈레탈메시 로드해서 할당
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/MannequinsXR/Meshes/SKM_MannyXR_left.SKM_MannyXR_left'"));
 	if (TempMesh.Succeeded())
 	{
 		LeftHandMesh->SetSkeletalMesh(TempMesh.Object);
 		LeftHandMesh->SetRelativeLocation(FVector(-2.9f, -3.5f, 4.5f));
 		LeftHandMesh->SetRelativeRotation(FRotator(-25, -180, 90));
-		LeftHandMesh->SetupAttachment(LeftHand);
 	}
 
-	//오른손 스켈레탈메시컴포넌트 만들기
 	RightHandMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightHandMesh"));
+	RightHandMesh->SetupAttachment(RightHand);
 
-	//오른손 스켈레탈메시 로드해서 할당
 	ConstructorHelpers::FObjectFinder<USkeletalMesh>TempMesh2(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/MannequinsXR/Meshes/SKM_MannyXR_right.SKM_MannyXR_right'"));
 	if (TempMesh2.Succeeded())
 	{
 		RightHandMesh->SetSkeletalMesh(TempMesh2.Object);
 		RightHandMesh->SetRelativeLocation(FVector(-2.9f, 3.5f, 4.5f));
 		RightHandMesh->SetRelativeRotation(FRotator(25, 0, 90));
-		RightHandMesh->SetupAttachment(RightHand);
 	}
+
+	RightAim = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("RightAim"));
+	RightAim->SetupAttachment(RootComponent);
+	RightAim->SetTrackingMotionSource(FName("RightAim"));
 
 	//총을 만든다
 	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Gun"));
@@ -65,7 +70,6 @@ ACosmicPlayer::ACosmicPlayer()
 		gunMeshComp->SetSkeletalMesh(GunMesh.Object);
 		gunMeshComp->SetRelativeLocationAndRotation(FVector(3.8f, 5.0f, -10.6f), FRotator(-5, -90, 55));
 		gunMeshComp->SetRelativeScale3D(FVector(0.5f));
-
 	}
 
 	//던짐총을 생성하고싶다
@@ -79,12 +83,23 @@ ACosmicPlayer::ACosmicPlayer()
 	{
 		//오브젝트로 등록을 한다.
 		ThrowGuncomp->SetStaticMesh(ThrowGunMeshComp.Object);
-		ThrowGuncomp->SetRelativeLocationAndRotation(FVector(20, 20, 10), FRotator(0, -90, -90));
+		ThrowGuncomp->SetRelativeLocationAndRotation(FVector(2, 8, -6), FRotator(-40, 180, 14));
 		ThrowGuncomp->SetRelativeScale3D(FVector(1.3f));
-
 	}
 
+	//소리를 넣고싶다
+	GunFireSound = CreateDefaultSubobject<USoundBase>(TEXT("GunFireSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> fireSound(TEXT("/Script/Engine.SoundWave'/Game/CosmicVR/Sound/Sound_Ddock_cutegun_.Sound_Ddock_cutegun_'"));
+	if (fireSound.Succeeded())
+	{
+		GunFireSound = (fireSound.Object);
+	}
+
+	//Item Widget
+	itemWidget = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("itemWidget"));
+	itemWidget->SetupAttachment(VRCamera);
 }
+
 
 // Called when the game starts or when spawned
 void ACosmicPlayer::BeginPlay()
@@ -101,8 +116,23 @@ void ACosmicPlayer::BeginPlay()
 		if (subSystem)
 		{
 			subSystem->AddMappingContext(IMC_VRInput, 0);
+			subSystem->AddMappingContext(IMC_Hand, 0);
 		}
 
+	}
+	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled() == false)
+	{
+		// 손을 테스트 할 수 있는 위치로 이동시키자
+		RightHand->SetRelativeLocation(FVector(20.0f, 20.0f, 0.0f));
+		RightAim->SetRelativeLocation(FVector(20.0f, 20.0f, 0.0f));
+
+		// 카메라의 use pawn control rotation 활성화
+		VRCamera->bUsePawnControlRotation = true;
+	}
+	else
+	{
+		// -> 기본 트렉킹 offset 설정
+		UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Eye);
 	}
 
 	bullet = Cast<ABulletActor>(UGameplayStatics::GetActorOfClass(GetWorld(), bulletFactory));
@@ -129,21 +159,10 @@ void ACosmicPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		//binding for moving
 		InputSystem->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ACosmicPlayer::Move);
 		InputSystem->BindAction(IA_Mouse, ETriggerEvent::Triggered, this, &ACosmicPlayer::Turn);
+		InputSystem->BindAction(IA_ThrowGun, ETriggerEvent::Started, this, &ACosmicPlayer::OnActionThrowGun);
+		InputSystem->BindAction(IA_Grenade, ETriggerEvent::Started, this, &ACosmicPlayer::OnActionGrenade);
+		InputSystem->BindAction(IA_Fire, ETriggerEvent::Started, this, &ACosmicPlayer::OnActionFirePressed);
 	}
-
-	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &ACosmicPlayer::OnActionFirePressed);
-
-	//기본총의 기능과 이걸눌렀을때 행동할 것을 BindAction으로 연결.
-	PlayerInputComponent->BindAction(TEXT("Grenadegun"), IE_Pressed, this, &ACosmicPlayer::OnActionGrenade);
-
-
-	//던짐총의 기능과 이걸눌렀을때 행동할 것을 BindAction으로 연결.
-	UE_LOG(LogTemp, Warning, TEXT("action"));
-	PlayerInputComponent->BindAction(TEXT("ThrowGun"), IE_Pressed, this, &ACosmicPlayer::OnActionThrowGun);
-
-
-
-	//PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &ACosmicPlayer::OnActionFireReleased);
 }
 
 
@@ -154,7 +173,6 @@ void ACosmicPlayer::ChooseGun(bool bGrenade)
 	//이 총을 선택했을 때 어떤총(메쉬)를 보여줄것이다
 	gunMeshComp->SetVisibility(bGrenade);
 	ThrowGuncomp->SetVisibility(!bGrenade);
-
 }
 
 void ACosmicPlayer::OnActionGrenade()
@@ -164,7 +182,6 @@ void ACosmicPlayer::OnActionGrenade()
 
 void ACosmicPlayer::OnActionThrowGun()
 {
-
 	ChooseGun(false);
 }
 
@@ -196,17 +213,18 @@ void ACosmicPlayer::Turn(const FInputActionValue& Values)
 
 void ACosmicPlayer::OnActionFirePressed()
 {
-
-	//타이머를 이용해서 한번클릭이후에 자동으로 생성하여 나가게하고싶다.
-	//GetWorld()->GetTimerManager().SetTimer(fireTimerHandle, this, &ACosmicPlayer::DoFire, fireInterval, true);
-
-	// 더블클릭을하면 총알이 안나가는 방법 해결 
-	DoFire();
-}
-
-void ACosmicPlayer::OnActionFireReleased()
-{
-	//GetWorldTimerManager().ClearTimer(fireTimerHandle);
+	//만약 기본총(그랜에이드건)이라면
+	if(BeChooseGrenade)
+	{
+		DoFire();
+		UGameplayStatics::PlaySoundAtLocation(this, GunFireSound, GetActorLocation(), GetActorRotation());
+	}
+	//그렇지않다면(던짐총)
+	else
+	{
+		//물건을 잡고싶다.
+		TryGrab();
+	}
 }
 
 void ACosmicPlayer::DoFire()
@@ -225,7 +243,12 @@ void ACosmicPlayer::DoFire()
 
 void ACosmicPlayer::TryGrab()
 {
-	//중심점
+	FHitResult hitResult;
+	FVector start;
+	FVector end;
+	//GetWorld()->LineTraceSingleByChannel(hitResult,start)
+	
+	/*//중심점
 	FVector Center = RightHand->GetComponentLocation();
 	//충돌체크해야함
 	//충돌한 물체들 기록할 배열
@@ -282,7 +305,7 @@ void ACosmicPlayer::TryGrab()
 
 	//프리포즈 초기값
 	PrevPos = RightHand->GetComponentLocation();
-	}
+	}*/
 
 }
 
@@ -317,4 +340,16 @@ void ACosmicPlayer::Grabbing()
 
 	//이전위치 업데이트
 	PrevPos = RightHand->GetComponentLocation();
+}
+
+void ACosmicPlayer::OpenItemWidget()
+{
+	//vr카메라의 get actor location에 일정 거리 떨어진 위치에 뜨도록 계산한다
+	FVector startpos = VRCamera->GetComponentLocation();
+	FVector widgetpos = startpos + VRCamera->GetForwardVector() * 500;
+
+	//GetWorld()->SpawnActor<>()
+	//얘를 띄울지 말지 결정하는 bool변수에 만들어놓고
+	//키 바인딩 하고
+	
 }

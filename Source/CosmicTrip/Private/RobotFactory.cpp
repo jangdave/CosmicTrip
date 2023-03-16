@@ -33,7 +33,7 @@ void ARobotFactory::BeginPlay()
 
 	// 임시 스폰
 	FTimerHandle timer;
-	GetWorld()->GetTimerManager().SetTimer(timer, this, &ARobotFactory::SpawnRazerRobot, 3, false);
+	//GetWorld()->GetTimerManager().SetTimer(timer, this, &ARobotFactory::SpawnRazerRobot, 3, false);
 }
 
 // Called every frame

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+	// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -19,7 +19,7 @@ public:
 
 	virtual void NativeBeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyFSM")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAnim")
 	EEnemyState caEnemyState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -27,12 +27,38 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bcaEnemyAttackEnd;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bcaEnemyDieEnd;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAttackPlay;
 
-	UFUNCTION()
-	void AnimNotify_Attack();
+	//로봇 혹은 플레이어를 향해 걸을지 선택할 변수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bChangeMove;
 
-	
+	//UFUNCTION()
+	//void AnimAttack(FName sectionName);
+
+	//UFUNCTION()
+	//void AnimDamage(FName sectionName);
+
+	//UFUNCTION()
+	//void AnimDie(FName sectionName);
+
+	UFUNCTION(BlueprintCallable)
+	void EndAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void EndDamage();
+
+	UFUNCTION(BlueprintCallable)
+	void EndDie();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UAnimMontage* enemyMontageFactory;
+
+	UPROPERTY(EditDefaultsOnly, Category = "State")
+	EEnemyState state;
 };

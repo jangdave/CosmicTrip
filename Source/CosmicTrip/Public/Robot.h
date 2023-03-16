@@ -27,8 +27,5 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(EditAnywhere, Category = "component")
-	class USphereComponent* sphereComp;
-
-	UPROPERTY(EditAnywhere, Category = "component")
 	class UStaticMeshComponent* meshComp;
 };

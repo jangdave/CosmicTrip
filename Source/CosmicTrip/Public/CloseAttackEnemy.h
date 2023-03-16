@@ -27,7 +27,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(EditDefaultsOnly)
-	class USkeletalMeshComponent* gunMesh;
+	class UStaticMeshComponent* gunMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnemySettings")
 	float walkSpeed = 250.f;

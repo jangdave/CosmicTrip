@@ -8,6 +8,8 @@
 #include <NavigationSystem.h>
 #include "AIController.h"
 #include "CloseAttackEnemyAnim.h"
+#include "RazerRobot.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values for this component's properties
 UCloseAttackEnemyFSM::UCloseAttackEnemyFSM()
@@ -29,10 +31,9 @@ void UCloseAttackEnemyFSM::BeginPlay()
 	ai = Cast<AAIController>(me->GetController());
 	hp = maxHP;
 	
-	//·£´ıÇÑÀ§Ä¡¿¡ ÀÖÀ» °Í
+	//ëœë¤í•œìœ„ì¹˜ì— ìˆì„ ê²ƒ	
 	UpdateRandomLocation(randLocationRadius, randomLocation);
 
-	
 }
 
 
@@ -49,135 +50,193 @@ void UCloseAttackEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, F
 	case EEnemyState::MOVE:
 		TickMove();
 		break;
+	case EEnemyState::MOVETOROBOT:
+		TickMoveToRobot();
+		break;
 	case EEnemyState::ATTACK:
 		TickAttack();
-		break;
-	case EEnemyState::DAMAGE:
-		TickDamage();
-		break;
-	case EEnemyState::DIE:
-		TickDie();
 		break;	
-	}
-	
+	case EEnemyState::ATTACKROBOT:
+		TickAttackRobot();
+		break;
+//	case EEnemyState::DAMAGE:
+//		TickDamage();
+//		break;
+//	case EEnemyState::DIE:
+//		TickDie();
+//		break;	
+	}	
+}
+
+void UCloseAttackEnemyFSM::SetState(EEnemyState next)
+{
+	state = next;
+	me->caEnemyAnim->state = next;
+	currentTime = 0;
 }
 
 void UCloseAttackEnemyFSM::TickIdle()
-{
+{	
 	mainTarget = Cast<ACosmicPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	if (!mainTarget) return;
-	state = EEnemyState::MOVE;
-
-}
-
-void UCloseAttackEnemyFSM::TickMove()
-{
-	//ÇÃ·¹ÀÌ¾î¸¦ ÇâÇØ ´Ş·Á¿Â´Ù
-	FVector targetDir = mainTarget->GetActorLocation() - me->GetActorLocation();
-
-	//³»°¡ °¥ ¼ö ÀÖ´Â ±æ À§¿¡ °ø°İ ´ë»óÀÌ ÀÖ´Â°¡
-	UNavigationSystemV1* ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
-	FPathFindingQuery query; //±æ Ã£À» ¼ö ÀÖ´ÂÁö ¿©ºÎ
-	FAIMoveRequest request;
-	request.SetAcceptanceRadius(acceptanceRadius);
-	request.SetGoalLocation(mainTarget->GetActorLocation());
-
-	ai->BuildPathfindingQuery(request, query);
-	ns->FindPathSync(query);
-	FPathFindingResult result = ns->FindPathSync(query);
-
-	if (result.Result == ENavigationQueryResult::Success)
+	if (!mainTarget)
 	{
-		//me->AddMovementInput(targetDir.GetSafeNormal());
-		ai->MoveToLocation(mainTarget->GetActorLocation());
+		return;
 	}
 	else
 	{
-		//Å¸°ÙÀÌ ³×ºñ°ÔÀÌ¼Ç À§¿¡ ¾ø´Ù¸é ·£´ıÇÑ À§Ä¡·Î µ¹¾Æ´Ù´Ïµµ·Ï
-		//·£´ıÇÑ À§Ä¡
-		auto randLoc = ai->MoveToLocation(randomLocation);
-		if (randLoc == EPathFollowingRequestResult::Failed || EPathFollowingRequestResult::AlreadyAtGoal)
-		{
-			UpdateRandomLocation(randLocationRadius, randomLocation);
-		}
+		me->caEnemyAnim->bChangeMove = true;
+		SetState(EEnemyState::MOVE);
 	}
+}
 
-	targetDist = mainTarget->GetDistanceTo(me);
+void UCloseAttackEnemyFSM::TickMove()
+{	
+	//í”Œë ˆì´ì–´ì˜ ë°©í–¥, ìœ„ì¹˜ ì°¾ëŠ”ë‹¤
+	//í”Œë ˆì´ì–´ê°€ ë‚˜ì™€ ê°ì§€ê±°ë¦¬ ì•ˆì— ìˆë‹¤ë©´ í”Œë ˆì´ì–´ë¥¼ í–¥í•´ ì´ë™í•œë‹¤
+	
+	//FVector targetDir = mainTarget->GetActorLocation() - me->GetActorLocation();
+	//me->caEnemyAnim->bChooseWalk = true;
+	//if (targetDist <= trackingRange)
+	//{
+	ai->MoveToLocation(mainTarget->GetActorLocation());
+	wantedLocation = mainTarget->GetActorLocation();
+	//}
+	targetDist = me->GetDistanceTo(mainTarget);
 
-	//°ø°İ ¹üÀ§¿¡ µé¾î¿À¸é °ø°İ »óÅÂ·Î ÀüÈ¯
+	//í”Œë ˆì´ì–´ë¥¼ ê³µê²©í•  ë²”ìœ„ ì•ˆì— ë“¤ì–´ì™”ë‹¤ë©´ í”Œë ˆì´ì–´ ê³µê²© ìƒíƒœë¡œ ì „í™˜
 	if (targetDist <= attackRange)
 	{
-		state = EEnemyState::ATTACK;
+// 		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));
+// 		me->caEnemyAnim->bChangeMove = false;
+// 		me->GetCharacterMovement()->MaxWalkSpeed = 0;
+// 		bAttackAnimPlay = true;
+		SetState(EEnemyState::ATTACK);		
 	}
-	else if (targetDist > trackingRange)
-	{
-		state = EEnemyState::MOVE;
-	}
-}
 
-void UCloseAttackEnemyFSM::TickAttack()
-{
-	currentTime += GetWorld()->GetDeltaSeconds();
-	if (currentTime >= attackDelayTime)
-	{
-		float dist = mainTarget->GetDistanceTo(me);
-
-		if (dist > attackRange)
-		{
-			state = EEnemyState::MOVE;
-		}
-		else
-		{
-			currentTime = 0;
-			bAttackPlay = false;
-
-			me->caEnemyAnim->bAttackPlay = true;
-		}
-	}
+	//ë¡œë´‡ì„ ì°¾ëŠ”ë‹¤
+	//ë¡œë´‡ì´ ë‚˜ì™€ ê°ì§€ë²”ìœ„ ì•ˆì— ìˆìœ¼ë©´ ë¡œë´‡ìœ¼ë¡œ í–¥í•˜ëŠ” stateë¥¼ ë§Œë“ ë‹¤
+	//razerTarget = Cast<ARazerRobot>(UGameplayStatics::GetActorOfClass(GetWorld(), ARazerRobot::StaticClass()));
+	
+	//if (trackingRange <= trackingRobotRange)
+	//{
+	//	SetState(EEnemyState::MOVETOROBOT);
+	//}
 
 }
 
-void UCloseAttackEnemyFSM::TickDamage()
+//ë¡œë´‡ì´ ë‚˜ì™€ ê°ì§€ê±°ë¦¬ ì•ˆì— ìˆë‹¤ë©´ ë¡œë´‡ì„ í–¥í•´ ì´ë™í•œë‹¤
+void UCloseAttackEnemyFSM::TickMoveToRobot()
 {
-	currentTime += GetWorld()->GetDeltaSeconds();
+	//ë¡œë´‡ì˜ ë°©í–¥ê³¼ ìœ„ì¹˜ë¥¼ ì°¾ëŠ”ë‹¤
+	FVector robotDir = razerTarget->GetActorLocation() - me->GetActorLocation();
+	razerTargetDist = razerTarget->GetDistanceTo(me);
 
-	if (currentTime > 1)
+	//ë¡œë´‡ì„ í–¥í•´ ì´ë™í•œë‹¤
+	ai->MoveToLocation(razerTarget->GetActorLocation());
+
+	//ë¡œë´‡ì„ ê³µê²©í•  ë²”ìœ„ ì•ˆì— ë“¤ì–´ì™”ë‹¤ë©´ ë¡œë´‡ ê³µê²© ìƒíƒœë¡œ ì „í™˜
+	if (razerTargetDist <= attackRange)
 	{
-		state = EEnemyState::MOVE;
-		currentTime = 0;
+		SetState(EEnemyState::ATTACKROBOT);
 	}
-
-	//ÇÃ·¹ÀÌ¾îÀÇ °ø°İÀ» ¹Ş¾Ò´Ù¸é °ø°İ´çÇÑ ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı
 	
 }
 
-void UCloseAttackEnemyFSM::TickDie()
+//í”Œë ˆì´ì–´ë¥¼ ê³µê²©
+void UCloseAttackEnemyFSM::TickAttack()
 {
-	//Á×´Â ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Àç»ı½ÃÅ²´Ù
-	me->Destroy();
+	if (bAttackAnimPlay != true)
+	{
+		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));
+		me->caEnemyAnim->bChangeMove = false;
+		me->GetCharacterMovement()->MaxWalkSpeed = 0;
+		bAttackAnimPlay = true;
+	}
+	
+	/*//ì¼ì • ì‹œê°„ì´ ì§€ë‚˜ë©´
+	currentTime += GetWorld()->GetDeltaSeconds();
+
+	//ì¼ì • ì‹œê°„ì— í•œë²ˆì”© ê³µê²©í•˜ê¸°
+	if (currentTime >= attackDelayTime)
+	{	
+		//ê³µê²© montage í˜¸ì¶œ
+		//me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));		
+		currentTime = 0;
+
+ 		bAttackPlay = false;
+		else
+ 		{ 
+ 			me->caEnemyAnim->bAttackPlay = true;
+ 		}
+	} 
+	//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚˜ë©´ moveë¡œ ì „í™˜
+	targetDist = mainTarget->GetDistanceTo(me);
+
+	if (targetDist > attackRange)
+	{
+		SetState(EEnemyState::MOVE);
+	}*/
 
 }
+
+//ë¡œë´‡ì„ ê³µê²©
+void UCloseAttackEnemyFSM::TickAttackRobot()
+{
+	//ì¼ì • ì‹œê°„ì´ ì§€ë‚˜ë©´
+	currentTime += GetWorld()->GetDeltaSeconds();
+	if (currentTime >= attackDelayTime) 
+	{
+		//ê³µê²© ì• ë‹ˆë©”ì´ì…˜
+		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));
+		currentTime = 0;
+
+	}	
+	//ë¡œë´‡ê³¼ ë‚˜ì˜ ê±°ë¦¬
+	razerTargetDist = razerTarget->GetDistanceTo(me);
+	//ê³µê²© ë²”ìœ„ë¥¼ ë²—ì–´ë‚˜ë©´ moveë¡œ ì „í™˜
+	if (razerTargetDist > attackRange)
+	{
+		SetState(EEnemyState::MOVE);
+	}
+		
+}
+
+// void UCloseAttackEnemyFSM::TickDamage()
+// {
+// 	currentTime += GetWorld()->GetDeltaSeconds();
+// 
+// 	//ê³µê²©ë°›ì€ ì• ë‹ˆë©”ì´ì…˜ í˜¸ì¶œ
+// 	me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Damage"));
+// 
+// 	if (currentTime > 1)
+// 	{
+// 		SetState(EEnemyState::MOVE);
+// 		currentTime = 0;
+// 	}	
+// }
 
 void UCloseAttackEnemyFSM::OnTakeDamage(float damage)
 {
 	maxHP -= damage;
 
-	if (maxHP <= 0)
+	me->GetCharacterMovement()->MaxWalkSpeed = 0;
+
+	if (maxHP > 0)
 	{
-		state = EEnemyState::DIE;
+		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Damage"));
+	}
+	else if (maxHP <= 0 && bDeathAnimPlay != true)
+	{
+		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Death"));
+		bDeathAnimPlay = true;
 	}
 }
 
+//í”Œë ˆì´ì–´ì˜ ì²´ë ¥ì„ ê¹ì„ ê²ƒì´ë‹¤
 void UCloseAttackEnemyFSM::OnHitEvent()
 {
-	me->caEnemyFSM->bAttackPlay = false;
+	//me->caEnemyFSM->bAttackPlay = false;
 
-	float dist = mainTarget->GetDistanceTo(me);
-	if (dist <= attackRange)
-	{
-		//mainTarge->
-		UE_LOG(LogTemp, Warning, TEXT("OnHitEvent() Attack"))
-	}
 }
 
 bool UCloseAttackEnemyFSM::UpdateRandomLocation(float radius, FVector& outLocation)
@@ -185,7 +244,7 @@ bool UCloseAttackEnemyFSM::UpdateRandomLocation(float radius, FVector& outLocati
 	UNavigationSystemV1* ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
 	FNavLocation navLoc;
 
-	bool result = ns->GetRandomReachablePointInRadius(me->GetActorLocation(), radius, navLoc);
+	bool result = ns->GetRandomPointInNavigableRadius(me->GetActorLocation(), radius, navLoc);
 
 	if (result)
 	{
@@ -194,4 +253,5 @@ bool UCloseAttackEnemyFSM::UpdateRandomLocation(float radius, FVector& outLocati
 
 	return result;
 }
+
 
