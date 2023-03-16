@@ -7,6 +7,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "CloseAttackEnemy.h"
 #include "CloseAttackEnemyFSM.h"
+#include "Boss.h"
+#include "BossFSM.h"
 
 // Sets default values
 ABulletActor::ABulletActor()
@@ -60,16 +62,19 @@ void ABulletActor::OnDie()
 
 void ABulletActor::BulletPower(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	auto enemy = Cast<ACloseAttackEnemy>(OtherActor);
+	ACloseAttackEnemy* enemy = Cast<ACloseAttackEnemy>(OtherActor);
+	ABoss* boss = Cast<ABoss>(OtherActor);
 
 	if (enemy != nullptr)
 	{
 		enemy->caEnemyFSM->OnTakeDamage(10);
+				
+	}
 
-		//FVector 
-		enemy->GetActorLocation();
+	if (boss != nullptr)
+	{
+		boss->bossFSM->OnDamageProcess(30);
 
-		//enemy->GetActorLocation();
 	}
 }
 

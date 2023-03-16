@@ -102,8 +102,6 @@ ACosmicPlayer::ACosmicPlayer()
 	itemWidget = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("itemWidget"));
 	itemWidget->SetupAttachment(VRCamera);
 	
-
-
 }
 
 

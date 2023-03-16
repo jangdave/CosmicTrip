@@ -20,6 +20,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	virtual void PostInitializeComponents() override;
+		
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -29,12 +31,10 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class USkeletalMeshComponent* gunMesh;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BossSettings")
-	float walkSpeed = 350.f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UBossFSM* bossFSM;
 
-	UPROPERTY(EditDefaultsOnly)
-	class UBossAnim* bossAnim;
 
+	
 };
