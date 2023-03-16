@@ -198,19 +198,23 @@ void URazerFSMComponent::OnOverlap()
 	params.AddIgnoredActor(me);
 	params.AddIgnoredActor(player);
 
-	bOverlapEnemy = GetWorld()->OverlapMultiByChannel(oversInfo, loc, rot, ECC_Visibility, FCollisionShape::MakeSphere(1000), params);
+	bool bHit = bOverlapEnemy = GetWorld()->OverlapMultiByChannel(oversInfo, loc, rot, ECC_Visibility, FCollisionShape::MakeSphere(1000), params);
 
-	//for (FOverlapResult overInfo : oversInfo)
+	for (FOverlapResult overInfo : oversInfo)
+	{
+		auto enemy = Cast<ACloseAttackEnemy>(overInfo.GetActor());
+
+		enemis.Add(enemy);
+
+		UE_LOG(LogTemp, Warning, TEXT("SSSSS"));
+	}
+	
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *enemis[0]->GetName());
+
+	//for (int i = 0; i<oversInfo.Num(); i++)
 	//{
-	//	auto enemy = Cast<ACloseAttackEnemy>(overInfo.GetActor());
+	//	auto enemy = Cast<ACloseAttackEnemy>(oversInfo[i].GetActor());
 
 	//	enemis.Add(enemy);
 	//}
-
-	for (int i = 0; i<oversInfo.Num(); i++)
-	{
-		auto enemy = Cast<ACloseAttackEnemy>(oversInfo[i].GetActor());
-
-		enemis.Add(enemy);
-	}
 }
