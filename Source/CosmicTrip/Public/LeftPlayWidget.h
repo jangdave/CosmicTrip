@@ -17,9 +17,9 @@ class COSMICTRIP_API ULeftPlayWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 hp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 maxhp;
 };

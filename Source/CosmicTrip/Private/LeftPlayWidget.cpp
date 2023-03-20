@@ -6,4 +6,5 @@
 void ULeftPlayWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
 }

@@ -147,14 +147,14 @@ void ACosmicPlayer::BeginPlay()
 	bullet = Cast<ABulletActor>(UGameplayStatics::GetActorOfClass(GetWorld(), bulletFactory));
 
 	user_UI = CreateWidget<UPlayUserWidget>(GetWorld(), playUserWidget);
-
-	left_UI = CreateWidget<ULeftPlayWidget>(GetWorld(), leftPlayWidget);
-
+	
 	ChooseGun(true);
 
 	HP = MaxHP;
+	
+	FTimerHandle time;
 
-	left_UI->maxhp = MaxHP;
+	GetWorld()->GetTimerManager().SetTimer(time, this, &ACosmicPlayer::Damage, 5, false);
 }
 
 // Called every frame
@@ -163,6 +163,7 @@ void ACosmicPlayer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	Grabbing();
+	
 }
 
 // Called to bind functionality to input
@@ -375,12 +376,15 @@ void ACosmicPlayer::OnPlayerDamage(int32 damage)
 {
 	HP -= damage;
 
-	left_UI->hp = HP;
-
 	user_UI->CallBlood();
 
 	if (HP <= 0)
 	{
 
 	}
+}
+
+void ACosmicPlayer::Damage()
+{
+	OnPlayerDamage(30);
 }

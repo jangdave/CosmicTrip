@@ -31,19 +31,17 @@ ABulletActor::ABulletActor()
 	movementComp->SetUpdatedComponent(spherComp);
 	movementComp->InitialSpeed = 5000;
 	movementComp->MaxSpeed = 5000;
-	movementComp->bShouldBounce = true;
-	movementComp->Bounciness = 0.5f;
+	movementComp->bShouldBounce = false;
 }
 
 // Called when the game starts or when spawned
 void ABulletActor::BeginPlay()
 {
 	Super::BeginPlay();
-	//SetLifeSpasn(2);
-	//LifeSpanExpired();
-
+	
 	FTimerHandle dieTimerHandle;
-	//GetWorldTimerManager().SetTimer(dieTimerHandle, this, &ABulletActor::OnDie, 0.1f);
+
+	GetWorldTimerManager().SetTimer(dieTimerHandle, this, &ABulletActor::OnDie, 2.0f);
 
 	spherComp->OnComponentBeginOverlap.AddDynamic(this, &ABulletActor::BulletPower);
 }
@@ -68,13 +66,13 @@ void ABulletActor::BulletPower(UPrimitiveComponent* OverlappedComponent, AActor*
 	if (enemy != nullptr)
 	{
 		enemy->caEnemyFSM->OnTakeDamage(10);
-				
+		Destroy();
 	}
 
 	if (boss != nullptr)
 	{
 		boss->bossFSM->OnDamageProcess(30);
-
+		Destroy();
 	}
 }
 

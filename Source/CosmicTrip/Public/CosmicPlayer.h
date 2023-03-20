@@ -188,8 +188,5 @@ public:
 
 	class UPlayUserWidget* user_UI;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ULeftPlayWidget> leftPlayWidget;
-
-	class ULeftPlayWidget* left_UI;
+	void Damage();
 };
