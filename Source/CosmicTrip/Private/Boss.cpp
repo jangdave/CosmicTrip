@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include <Kismet/GameplayStatics.h>
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 ABoss::ABoss()
@@ -32,14 +33,15 @@ ABoss::ABoss()
 
 	bossFSM = CreateDefaultSubobject<UBossFSM>(TEXT("BossFSM"));
 
-	gunMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMesh"));
-	gunMesh->SetupAttachment(GetMesh());
+	weaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("gunMesh"));
+	weaponMesh->SetupAttachment(GetMesh(),TEXT("hand_rSocket"));
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempgunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/FPWeapon/Mesh/SK_FPGun.SK_FPGun'"));
-	if (tempgunMesh.Succeeded())
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempweaponMesh(TEXT("/Script/Engine.StaticMesh'/Game/CosmicVR/Assets/Enemy/BossLightSaber/source/SaberToTexture.SaberToTexture'"));
+	if (tempweaponMesh.Succeeded())
 	{
-		gunMesh->SetSkeletalMesh(tempgunMesh.Object);
-		gunMesh->SetRelativeLocationAndRotation(FVector(30, 30, 120), FRotator(0, 0, 0));
+		weaponMesh->SetStaticMesh(tempweaponMesh.Object);
+		weaponMesh->SetRelativeLocationAndRotation(FVector(3.7f, 7, 7.78f), FRotator(0, -90, -100));
+		weaponMesh->SetRelativeScale3D(FVector(0.15f));
 	}
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
@@ -78,8 +80,6 @@ void ABoss::Tick(float DeltaTime)
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-
 
 }
 

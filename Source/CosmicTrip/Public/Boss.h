@@ -29,7 +29,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(EditDefaultsOnly)
-	class USkeletalMeshComponent* gunMesh;
+	class UStaticMeshComponent* weaponMesh;
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
