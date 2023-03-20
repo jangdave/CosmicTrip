@@ -12,7 +12,6 @@ void UCloseAttackEnemyAnim::NativeBeginPlay()
 
 	me = Cast<ACloseAttackEnemy>(TryGetPawnOwner());
 
-	//meFSM = Cast<ACloseAttackEnemyFSM>()
 }
 
 // void UCloseAttackEnemyAnim::AnimAttack(FName sectionName)

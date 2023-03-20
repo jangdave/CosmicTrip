@@ -6,6 +6,7 @@
 #include "caEnemySpawnSpot.h"
 #include "CloseAttackEnemy.h"
 #include "Components/StaticMeshComponent.h"
+#include "Boss.h"
 
 // Sets default values
 AcaEnemySpawnManager::AcaEnemySpawnManager()
@@ -21,12 +22,15 @@ void AcaEnemySpawnManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AcaEnemySpawnSpot::StaticClass(), spawnList);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AcaEnemySpawnSpot::StaticClass(), spawnList);	
 	
-	//int randTime = FMath::RandRange(minTime, maxTime);
-	GetWorldTimerManager().SetTimer(timerHandlespawncaEnemy, this, &AcaEnemySpawnManager::SpawnEnemy, 1);
+	GetWorldTimerManager().SetTimer(timerHandlespawncaEnemy, this, &AcaEnemySpawnManager::SpawnEnemy, 1, false);
+	
 	//UE_LOG(LogTemp, Error, TEXT("AcaEnemySpawnManager::BeginPlay()"))
-	auto enmey = Cast<ACloseAttackEnemy>(UGameplayStatics::GetActorOfClass(GetWorld(), caEnemyFactory));
+	ACloseAttackEnemy* enmey = Cast<ACloseAttackEnemy>(UGameplayStatics::GetActorOfClass(GetWorld(), caEnemyFactory));
+
+	ABoss* boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), bossFactory));
+
 }
 
 // Called every frame
@@ -38,8 +42,40 @@ void AcaEnemySpawnManager::Tick(float DeltaTime)
 
 void AcaEnemySpawnManager::SpawnEnemy()
 {
-	int randIndex = 0;
+	EnemyCount++;
 
+	if (limitedEnemyCount >= EnemyCount)
+	{
+		int randIndex = 0;		
+		randIndex = FMath::RandRange(0, spawnList.Num() - 1);
+		if (randIndex == prevRandIndex)
+		{
+			randIndex = (randIndex + 1) % spawnList.Num();
+		}
+
+		FVector loc = spawnList[randIndex]->GetActorLocation();
+		FRotator rot = spawnList[randIndex]->GetActorRotation();
+		GetWorld()->SpawnActor<ACloseAttackEnemy>(caEnemyFactory, loc, rot);
+
+		int randomTime = FMath::RandRange(minTime, maxTime);
+		GetWorldTimerManager().SetTimer(timerHandlespawncaEnemy, this, &AcaEnemySpawnManager::SpawnEnemy, randomTime);
+		prevRandIndex = randIndex;
+
+	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer(timerHandlespawncaEnemy);
+
+		//Boss 스폰하는 함수를 호출해준다.
+		GetWorld()->GetTimerManager().SetTimer(timerHandleSpawnBoss, this, &AcaEnemySpawnManager::SpawnBoss, 5);
+
+	}
+}
+
+void AcaEnemySpawnManager::SpawnBoss()
+{	
+
+	int randIndex = 0;	
 	randIndex = FMath::RandRange(0, spawnList.Num() - 1);
 	if (randIndex == prevRandIndex)
 	{
@@ -48,12 +84,7 @@ void AcaEnemySpawnManager::SpawnEnemy()
 
 	FVector loc = spawnList[randIndex]->GetActorLocation();
 	FRotator rot = spawnList[randIndex]->GetActorRotation();
-	GetWorld()->SpawnActor<ACloseAttackEnemy>(caEnemyFactory, loc, rot);
-
-	int randomTime = FMath::RandRange(minTime, maxTime);
-	GetWorldTimerManager().SetTimer(timerHandlespawncaEnemy, this, &AcaEnemySpawnManager::SpawnEnemy, randomTime);
-
-	//UE_LOG(LogTemp, Warning, TEXT("AcaEnemySpawnManager::SpawnEnemy()"))
-
+	GetWorld()->SpawnActor<ABoss>(bossFactory, loc, rot);
+	//prevRandIndex = randIndex;
 }
 

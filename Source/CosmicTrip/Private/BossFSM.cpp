@@ -53,15 +53,16 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	case EBossState::ATTACK:
 		AttackState();
 		break;
+	case EBossState::NEXTATTACK:
+		NextAttackState();
+		break;
 	case EBossState::DAMAGE:
 		DamageState();
 		break;
 	case EBossState::DIE:
 		DieState();
 		break;
-
 	}
-
 }
 
 void UBossFSM::IdleState()
@@ -71,20 +72,25 @@ void UBossFSM::IdleState()
 	{
 		return;
 	}
+
+	me->GetCharacterMovement()->MaxWalkSpeed = 0;
+
 	currentTime += GetWorld()->DeltaTimeSeconds;
 	if (currentTime > 0.5f)
 	{
 		currentTime = 0;
+		me->GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+
 		state = EBossState::MOVE;
 		//state 갱신
 		bossAnim->animState = state;
 	}
-	//MoveState();
-
+	
 }
 
 void UBossFSM::MoveState()
-{
+{	
+	mainTargetDist = me->GetDistanceTo(mainTarget);	
 	//플레이어를 향해 움직인다
 	if (mainTarget)
 	{
@@ -92,46 +98,53 @@ void UBossFSM::MoveState()
 		//플레이어의 위치를 찾는다, 이동한다
 		ai->MoveToLocation(mainTargetLoc);
 		
-	}
-
-	// 일정시간이 되면 점프하고 싶다.
-	//TryJump();
-
-	mainTargetDist = me->GetDistanceTo(mainTarget);	
+	}	
 	//플레이어와의 거리가 공격 범위 이하이면 공격 애니메이션을 실행하는 함수를 호출한다
-	if (attackRange >= mainTargetDist)
-	{
-		me->GetCharacterMovement()->MaxWalkSpeed = 0;
-		
+	if (attackRange >= mainTargetDist && bossAnim->bAttackPlay == true)
+	{				
 		state = EBossState::ATTACK;
 		bossAnim->animState = state;
-	}
-}
 
-//랜덤한 시간에 점프 애니메이션을 한다 (애니메이션 다 하면 수정할것, state가 아닌 그냥 함수로)
-void UBossFSM::TryJump()
-{
-	//걷기 속도를 0으로 만들고 제자리에서 점프하도록
-	//me->GetCharacterMovement()->MaxWalkSpeed = 0;
-	//랜덤한 시간
-	FTimerHandle jumpTimerHandle;
-	float minTime = 4;
-	float maxTime = 8;
-	float randJumpTime = FMath::RandRange(minTime, maxTime);
-	GetWorld()->GetTimerManager().SetTimer(jumpTimerHandle, this, &UBossFSM::TryJump, randJumpTime);
-	me->PlayAnimMontage(bossAnim->bossAnimFactory, 1, FName("Jump"));
+		UE_LOG(LogTemp, Warning, TEXT("UBossFSM::MoveState() >> Attack State"))
+	}
+	else if (attackRange >= mainTargetDist && bossAnim->bAttackPlay == false)
+	{
+		state = EBossState::NEXTATTACK;
+		bossAnim->animState = state;
+		
+	}
+
 }
 
 void UBossFSM::AttackState()
-{
+{	
 	//플레이어를 공격하는 애니메이션	
-	bAttackPlay = true;
-	//UE_LOG(LogTemp, Warning, TEXT("UBossFSM:: UBossFSM::AttackState()"))
+	me->GetCharacterMovement()->MaxWalkSpeed = 0;
 
-	//타겟과의 거리가 공격범위를 벗어나면
-	if (attackRange < mainTargetDist)
+	// 1. 시간이 흘렀으니까
+	currentTime += GetWorld()->GetDeltaSeconds();
+	// 2. 대기시간이 끝났으니까
+	if (currentTime > damageDelayTime)
+	{		
+		// 3. Idle 로 상태 전환
+		currentTime = 0;
+		state = EBossState::IDLE;
+		bossAnim->animState = state;
+		//첫 공격에만 이 애니메이션을 재생하도록
+		bossAnim->bAttackPlay = false;
+	}	
+}
+
+//첫 공격을 하면 두번째 공격은 이것부터
+void UBossFSM::NextAttackState()
+{
+	//me->GetCharacterMovement()->MaxWalkSpeed = 0;
+	
+	currentTime += GetWorld()->GetDeltaSeconds();
+	if (currentTime > damageDelayTime)
 	{
-		//다시 플레이어를 찾도록
+		UE_LOG(LogTemp, Warning, TEXT("UBossFSM::MoveState() >>>>>>>> NEXT ATTACK State"))
+		currentTime = 0;	
 		state = EBossState::IDLE;
 		bossAnim->animState = state;
 	}
@@ -141,25 +154,24 @@ void UBossFSM::DamageState() //시점을 잡아주는 역할
 {
 	
 	// 일정시간 기다렸다가 상태를 Idle 로 전환하고 싶다.
-	UE_LOG(LogTemp, Warning, TEXT("UBossFSM::DamageState() Change into IDLE"))
 	
 	// 1. 시간이 흘렀으니까
 	currentTime += GetWorld()->GetDeltaSeconds();
 	// 2. 대기시간이 끝났으니까
 	if (currentTime > damageDelayTime)
-	{
+	{		
 		// 3. Idle 로 상태 전환
-		state = EBossState::IDLE;
-		bossAnim->animState = state;
 		currentTime = 0;
+		state = EBossState::MOVE;
+		bossAnim->animState = state;
 	}
+	
+	bossAnim->bBossEndDie = false;
 }
 
 void UBossFSM::DieState()
-{
-	//hp가 0 이하가 되면 죽는 애니메이션
-	me->PlayAnimMontage(bossAnim->bossAnimFactory, 1, FName("Die"));	
-	
+{	
+	me->GetCharacterMovement()->MaxWalkSpeed = 0;
 }
 
 void UBossFSM::OnDamageProcess(float attack)
@@ -172,7 +184,9 @@ void UBossFSM::OnDamageProcess(float attack)
 	{
 		state = EBossState::DIE;
 		bossAnim->animState = state;
-		
+		me->PlayAnimMontage(bossAnim->bossAnimFactory, 1, FName("Die"));
+	
+		bossAnim->bBossEndDie = false;
 	}
 	else
 	{
@@ -180,6 +194,12 @@ void UBossFSM::OnDamageProcess(float attack)
 		state = EBossState::DAMAGE;
 		bossAnim->animState = state;
 		me->PlayAnimMontage(bossAnim->bossAnimFactory, 1, FName("Damage"));
+		
+		//뒤로 밀리기 P = P0 + vt
+		FVector p0 = me->GetActorLocation();
+		float easing = 1 - pow(2, -8 * GetWorld()->GetDeltaSeconds());
+		FVector vect = me->GetActorForwardVector() * -1 * GetWorld()->GetDeltaSeconds() * 130000 * easing;		
+		me->SetActorLocation(p0 + vect);
 	}
 }
 

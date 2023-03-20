@@ -40,6 +40,7 @@ ACloseAttackEnemy::ACloseAttackEnemy()
 		gunMesh->SetStaticMesh(tempgunMesh.Object);
 		gunMesh->SetRelativeLocationAndRotation(FVector(-8, 6, -20), FRotator(0, 180, 0));
 		gunMesh->SetRelativeScale3D(FVector(0.2f));
+		gunMesh->SetCollisionProfileName(TEXT("AxePreset"));
 	}
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;

@@ -44,7 +44,7 @@ public:
 	
 	//멈춰서 플레이어 공격할 범위
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float attackRange = 200;
+	float attackRange = 500;
 
 	//플레이어 추적 거리
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
@@ -90,9 +90,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
 	float randLocationRadius = 400;
-
-	//움직임
-	//void FindMoveTarget(FVector WantedLocation);
 
 	//체력
 	float hp;

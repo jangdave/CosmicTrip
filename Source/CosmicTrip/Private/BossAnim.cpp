@@ -17,18 +17,33 @@ void UBossAnim::NativeBeginPlay()
 void UBossAnim::EndDamage()
 {
 	me->GetCharacterMovement()->MaxWalkSpeed = me->bossFSM->walkSpeed;
+	//me->bossFSM->bDamagePlay = false;
 	animState = EBossState::IDLE;
-	me->bossFSM->bAttackPlay = false;
+	animState = me->bossFSM->state;
+}
+
+void UBossAnim::EndAttack()
+{
+	//me->bossFSM->bAttackPlay = false;
+	me->GetCharacterMovement()->MaxWalkSpeed = me->bossFSM->walkSpeed;
+
+	animState = EBossState::IDLE;
+	animState = me->bossFSM->state;
+
 }
 
 void UBossAnim::EndDie()
-{
-	
+{		
 	me->Destroy();
+	
 }
 
-void UBossAnim::DieDestroy()
+void UBossAnim::EndNextAttack()
 {
+	//두번째 공격부터는 이 애니메이션을 재생하도록
+	me->GetCharacterMovement()->MaxWalkSpeed = me->bossFSM->walkSpeed;
 
+	animState = EBossState::IDLE;
+	animState = me->bossFSM->state;
 }
 
