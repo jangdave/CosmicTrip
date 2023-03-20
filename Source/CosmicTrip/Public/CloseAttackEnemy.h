@@ -29,6 +29,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UStaticMeshComponent* gunMesh;
 
+	UPROPERTY(EditDefaultsOnly)
+	class UCapsuleComponent* axeBox;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnemySettings")
 	float walkSpeed = 250.f;
 
@@ -37,7 +40,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UCloseAttackEnemyAnim* caEnemyAnim;
 
-
+	//플레이어의 체력을 깎는다
+	UFUNCTION()
+	void OnOverlapEnemyEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 
 };

@@ -381,6 +381,7 @@ void ACosmicPlayer::OnPlayerDamage(int32 damage)
 
 	if (HP <= 0)
 	{
-
+		
 	}
+	UE_LOG(LogTemp, Warning, TEXT("AAAAAAAAAACosmicPlayer::OnPlayerDamage HP : %d"), HP)
 }

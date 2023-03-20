@@ -25,12 +25,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void EndDamage();
-	UFUNCTION(BlueprintCallable)
-	void EndAttack();
+// 	UFUNCTION(BlueprintCallable)
+// 	void EndAttack();
 	UFUNCTION(BlueprintCallable)
 	void EndDie();
 	UFUNCTION(BlueprintCallable)
 	void EndNextAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void EndJumpAttack();
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation")
@@ -44,8 +47,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAttackPlay = true;
 
-	//다음 공격 Animation 재생하는지 확인하기
-// 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-// 	bool bNextAttackPlay = true;
+	
 
 };

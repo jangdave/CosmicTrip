@@ -105,7 +105,6 @@ void UBossFSM::MoveState()
 		state = EBossState::ATTACK;
 		bossAnim->animState = state;
 
-		UE_LOG(LogTemp, Warning, TEXT("UBossFSM::MoveState() >> Attack State"))
 	}
 	else if (attackRange >= mainTargetDist && bossAnim->bAttackPlay == false)
 	{
@@ -117,7 +116,7 @@ void UBossFSM::MoveState()
 }
 
 void UBossFSM::AttackState()
-{	
+{		
 	//플레이어를 공격하는 애니메이션	
 	me->GetCharacterMovement()->MaxWalkSpeed = 0;
 
@@ -132,18 +131,18 @@ void UBossFSM::AttackState()
 		bossAnim->animState = state;
 		//첫 공격에만 이 애니메이션을 재생하도록
 		bossAnim->bAttackPlay = false;
+
 	}	
 }
 
 //첫 공격을 하면 두번째 공격은 이것부터
 void UBossFSM::NextAttackState()
 {
-	//me->GetCharacterMovement()->MaxWalkSpeed = 0;
+	me->GetCharacterMovement()->MaxWalkSpeed = 0;
 	
 	currentTime += GetWorld()->GetDeltaSeconds();
 	if (currentTime > damageDelayTime)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UBossFSM::MoveState() >>>>>>>> NEXT ATTACK State"))
+	{		
 		currentTime = 0;	
 		state = EBossState::IDLE;
 		bossAnim->animState = state;
@@ -198,8 +197,9 @@ void UBossFSM::OnDamageProcess(float attack)
 		//뒤로 밀리기 P = P0 + vt
 		FVector p0 = me->GetActorLocation();
 		float easing = 1 - pow(2, -8 * GetWorld()->GetDeltaSeconds());
-		FVector vect = me->GetActorForwardVector() * -1 * GetWorld()->GetDeltaSeconds() * 130000 * easing;		
+		FVector vect = me->GetActorForwardVector() * -1 * GetWorld()->GetDeltaSeconds() * 170000 * easing;		
 		me->SetActorLocation(p0 + vect);
 	}
 }
+
 

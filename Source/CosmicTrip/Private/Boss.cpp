@@ -4,6 +4,7 @@
 #include "Boss.h"
 #include "BossFSM.h"
 #include "CloseAttackEnemyAnim.h"
+#include "CosmicPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include <Kismet/GameplayStatics.h>
@@ -35,6 +36,7 @@ ABoss::ABoss()
 
 	weaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("gunMesh"));
 	weaponMesh->SetupAttachment(GetMesh(),TEXT("hand_rSocket"));
+	
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempweaponMesh(TEXT("/Script/Engine.StaticMesh'/Game/CosmicVR/Assets/Enemy/BossLightSaber/source/SaberToTexture.SaberToTexture'"));
 	if (tempweaponMesh.Succeeded())
@@ -43,6 +45,12 @@ ABoss::ABoss()
 		weaponMesh->SetRelativeLocationAndRotation(FVector(3.7f, 7, 7.78f), FRotator(0, -90, -100));
 		weaponMesh->SetRelativeScale3D(FVector(0.15f));
 	}
+
+	weaponBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("weaponBox"));
+	weaponBox->SetupAttachment(weaponMesh);
+	weaponBox->SetRelativeLocationAndRotation(FVector(0, 299, 100), FRotator(0, 0, 90));
+	weaponBox->SetCapsuleSize(65, 525);
+
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	//충돌 프리셋
@@ -54,6 +62,7 @@ void ABoss::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	weaponBox->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnHitBossEvent);
 }
 
 void ABoss::PostInitializeComponents()
@@ -83,3 +92,14 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+//플레이어의 체력을 깎을 것이다
+void ABoss::OnHitBossEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ACosmicPlayer* player = Cast<ACosmicPlayer>(OtherActor);
+	if (player != nullptr)
+	{
+		player->OnPlayerDamage(10);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("UBossFSM::OnHitEvent() Subtract Damage"))
+
+}

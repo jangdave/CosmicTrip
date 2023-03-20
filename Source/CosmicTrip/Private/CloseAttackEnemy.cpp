@@ -6,6 +6,7 @@
 #include "CloseAttackEnemyAnim.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "CosmicPlayer.h"
 
 
 // Sets default values
@@ -43,6 +44,11 @@ ACloseAttackEnemy::ACloseAttackEnemy()
 		gunMesh->SetCollisionProfileName(TEXT("AxePreset"));
 	}
 
+	axeBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("axeBox"));
+	axeBox->SetupAttachment(gunMesh);
+	axeBox->SetRelativeLocationAndRotation(FVector(0, -11, 350), FRotator(0, 0, 0));
+	axeBox->SetCapsuleSize(130, 300);
+
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("CloseAttackEnemyPreset"));
 	
@@ -55,6 +61,9 @@ void ACloseAttackEnemy::BeginPlay()
 
 	caEnemyAnim = Cast<UCloseAttackEnemyAnim>(GetMesh()->GetAnimInstance());
 	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+
+	axeBox->SetGenerateOverlapEvents(true);
+	axeBox->OnComponentBeginOverlap.AddDynamic(this, &ACloseAttackEnemy::OnOverlapEnemyEvent);
 	
 }
 
@@ -62,7 +71,6 @@ void ACloseAttackEnemy::BeginPlay()
 void ACloseAttackEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -72,4 +80,15 @@ void ACloseAttackEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 }
 
+//플레이어의 체력을 깎을 것이다
+void ACloseAttackEnemy::OnOverlapEnemyEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("UUUUUUUUUUUCloseAttackEnemyFSM::OnHitEvent Subtract Damage"))
+	auto player = Cast<ACosmicPlayer>(OtherActor);
+	if (player != nullptr)
+	{
+		player->OnPlayerDamage(4);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("UUUUUUUUUUUCloseAttackEnemyFSM::OnHitEvent Subtract Damage"))
+}
 
