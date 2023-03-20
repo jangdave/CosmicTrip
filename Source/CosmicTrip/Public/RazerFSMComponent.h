@@ -45,6 +45,9 @@ public:
 	UPROPERTY()
 	class AAIController* aiRazer;
 
+	UPROPERTY()
+	class ABoss* boss;
+
 	void TickIdle();
 
 	void TickMove();
@@ -60,9 +63,7 @@ public:
 	void OnDamage(int32 damage);
 
 	void SetRazerState(ERazerState next);
-
-	void FireRazerBeam();
-
+	
 	void OnOverlap();
 	
 	UPROPERTY(EditDefaultsOnly, Category = "circle")
@@ -83,7 +84,7 @@ public:
 
 	float curTime;
 
-	float reTime = 5;
+	float reTime = 2;
 
 	bool bCheckFire;
 

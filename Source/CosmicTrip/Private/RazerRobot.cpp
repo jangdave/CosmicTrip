@@ -2,12 +2,15 @@
 
 
 #include "RazerRobot.h"
+#include "Boss.h"
 #include "CloseAttackEnemy.h"
 #include "CloseAttackEnemyFSM.h"
+#include "CosmicPlayer.h"
 #include "RazerFSMComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ARazerRobot::ARazerRobot()
 {
@@ -35,6 +38,9 @@ void ARazerRobot::BeginPlay()
 {
 	Super::BeginPlay();
 
+	boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
+
+	player = Cast<ACosmicPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ACosmicPlayer::StaticClass()));
 }
 
 void ARazerRobot::Tick(float DeltaTime)
@@ -53,6 +59,10 @@ void ARazerRobot::StartFire()
 
 		FHitResult hitResult;
 		FCollisionQueryParams params;
+		params.AddIgnoredActor(this);
+		params.AddIgnoredActor(boss);
+		params.AddIgnoredActor(player);
+
 		bool bHit = GetWorld()->LineTraceSingleByChannel(hitResult, GetActorLocation(), razerFSM->enemis[0]->GetActorLocation(), ECollisionChannel::ECC_Visibility, params);
 
 		if (bHit)

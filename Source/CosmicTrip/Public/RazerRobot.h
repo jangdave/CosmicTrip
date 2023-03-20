@@ -38,4 +38,10 @@ public:
 
 	UFUNCTION()
 	void StartFire();
+
+	UPROPERTY()
+	class ABoss* boss;
+
+	UPROPERTY()
+	class ACosmicPlayer* player;
 };

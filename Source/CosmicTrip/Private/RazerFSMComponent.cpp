@@ -2,6 +2,7 @@
 
 
 #include "RazerFSMComponent.h"
+#include "Boss.h"
 #include "CloseAttackEnemy.h"
 #include "CloseAttackEnemyFSM.h"
 #include "CosmicPlayer.h"
@@ -31,9 +32,11 @@ void URazerFSMComponent::BeginPlay()
 	
 	player = Cast<ACosmicPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
+	boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
+
 	SetRazerState(ERazerState::IDLE);
 
-	me->GetCharacterMovement()->MaxFlySpeed = 200.0f;
+	me->GetCharacterMovement()->MaxFlySpeed = 300.0f;
 }
 
 
@@ -117,12 +120,12 @@ void URazerFSMComponent::TickPatrol()
 
 	if (bOverlapEnemy != false && IsValid(enemis[0]))
 	{
-		me->GetCharacterMovement()->MaxFlySpeed = 200.0f;
+		me->GetCharacterMovement()->MaxFlySpeed = 300.0f;
 		SetRazerState(ERazerState::ATTACK);
 	}
 	else
 	{
-		me->GetCharacterMovement()->MaxFlySpeed = 200.0f;
+		me->GetCharacterMovement()->MaxFlySpeed = 300.0f;
 		SetRazerState(ERazerState::IDLE);
 	}
 }
@@ -168,8 +171,9 @@ void URazerFSMComponent::TickDamage()
 
 	if (enemis[0] == nullptr || !IsValid(enemis[0]))
 	{
+		enemis.Reset();
 		me->SetActorRotation(FRotator::ZeroRotator);
-		me->GetCharacterMovement()->MaxFlySpeed = 200;
+		me->GetCharacterMovement()->MaxFlySpeed = 300;
 		SetRazerState(ERazerState::IDLE);
 	}
 }
@@ -197,16 +201,15 @@ void URazerFSMComponent::OnOverlap()
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(me);
 	params.AddIgnoredActor(player);
-
-	bool bHit = bOverlapEnemy = GetWorld()->OverlapMultiByChannel(oversInfo, loc, rot, ECC_Visibility, FCollisionShape::MakeSphere(1000), params);
+	params.AddIgnoredActor(boss);
+	
+	bOverlapEnemy = GetWorld()->OverlapMultiByChannel(oversInfo, loc, rot, ECC_Visibility, FCollisionShape::MakeSphere(1000), params);
 
 	for (FOverlapResult overInfo : oversInfo)
 	{
 		auto enemy = Cast<ACloseAttackEnemy>(overInfo.GetActor());
 
 		enemis.Add(enemy);
-
-		UE_LOG(LogTemp, Warning, TEXT("SSSSS"));
 	}
 	
 	//UE_LOG(LogTemp, Warning, TEXT("%s"), *enemis[0]->GetName());

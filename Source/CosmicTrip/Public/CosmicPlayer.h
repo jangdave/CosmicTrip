@@ -170,4 +170,26 @@ public:
 	UFUNCTION()
 	void OpenItemWidget();
 
+	UFUNCTION()
+	void OnPlayerDamage(int32 damage);
+
+	int32 MaxHP = 50;
+
+	int32 HP;
+
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	class UWidgetComponent* playWidget;
+
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	class UWidgetComponent* leftWidget;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UPlayUserWidget> playUserWidget;
+
+	class UPlayUserWidget* user_UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ULeftPlayWidget> leftPlayWidget;
+
+	class ULeftPlayWidget* left_UI;
 };

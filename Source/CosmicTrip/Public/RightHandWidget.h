@@ -3,27 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
-#include "CosmicGameModeBase.generated.h"
+#include "GameFramework/Actor.h"
+#include "RightHandWidget.generated.h"
 
-/**
- * 
- */
 UCLASS()
-class COSMICTRIP_API ACosmicGameModeBase : public AGameModeBase
+class COSMICTRIP_API ARightHandWidget : public AActor
 {
 	GENERATED_BODY()
-
-public:
-	// Sets default values for this character's properties
-	ACosmicGameModeBase();
+	
+public:	
+	// Sets default values for this actor's properties
+	ARightHandWidget();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
+public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 };

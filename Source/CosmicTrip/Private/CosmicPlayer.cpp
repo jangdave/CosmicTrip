@@ -13,7 +13,9 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "IHeadMountedDisplay.h"
 #include "Components/WidgetInteractionComponent.h"
-#include "PlayerItemWidget.h"
+#include "PlayUserWidget.h"
+#include "LeftPlayWidget.h"
+#include "Components/WidgetComponent.h"
 
 // Sets default values
 ACosmicPlayer::ACosmicPlayer()
@@ -98,6 +100,13 @@ ACosmicPlayer::ACosmicPlayer()
 	//Item Widget
 	itemWidget = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("itemWidget"));
 	itemWidget->SetupAttachment(VRCamera);
+
+	playWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("playWidget"));
+	playWidget->SetupAttachment(VRCamera);
+
+	leftWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("leftWidget"));
+	leftWidget->SetupAttachment(LeftHandMesh);
+
 }
 
 
@@ -137,7 +146,15 @@ void ACosmicPlayer::BeginPlay()
 
 	bullet = Cast<ABulletActor>(UGameplayStatics::GetActorOfClass(GetWorld(), bulletFactory));
 
+	user_UI = CreateWidget<UPlayUserWidget>(GetWorld(), playUserWidget);
+
+	left_UI = CreateWidget<ULeftPlayWidget>(GetWorld(), leftPlayWidget);
+
 	ChooseGun(true);
+
+	HP = MaxHP;
+
+	left_UI->maxhp = MaxHP;
 }
 
 // Called every frame
@@ -352,4 +369,18 @@ void ACosmicPlayer::OpenItemWidget()
 	//얘를 띄울지 말지 결정하는 bool변수에 만들어놓고
 	//키 바인딩 하고
 	
+}
+
+void ACosmicPlayer::OnPlayerDamage(int32 damage)
+{
+	HP -= damage;
+
+	left_UI->hp = HP;
+
+	user_UI->CallBlood();
+
+	if (HP <= 0)
+	{
+
+	}
 }
