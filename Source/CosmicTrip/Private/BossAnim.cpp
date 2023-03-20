@@ -22,15 +22,14 @@ void UBossAnim::EndDamage()
 	animState = me->bossFSM->state;
 }
 
-void UBossAnim::EndAttack()
-{
-	//me->bossFSM->bAttackPlay = false;
-	me->GetCharacterMovement()->MaxWalkSpeed = me->bossFSM->walkSpeed;
-
-	animState = EBossState::IDLE;
-	animState = me->bossFSM->state;
-
-}
+// void UBossAnim::EndAttack()
+// {
+// 	//me->bossFSM->bAttackPlay = false;
+// 	me->GetCharacterMovement()->MaxWalkSpeed = me->bossFSM->walkSpeed;
+// 	//점프하고 땅에 닿은 위치 : EndAttack anim notify가 호출된 지점
+// 	animState = EBossState::IDLE;
+// 	animState = me->bossFSM->state;
+// }
 
 void UBossAnim::EndDie()
 {		
@@ -45,5 +44,14 @@ void UBossAnim::EndNextAttack()
 
 	animState = EBossState::IDLE;
 	animState = me->bossFSM->state;
+}
+
+void UBossAnim::EndJumpAttack()
+{
+	//점프하고 이동한 위치의 값을 가져온다.
+	FVector landingLoc = me->GetActorLocation();
+	//그 위치의 값을 현재 내 위치로 업데이트한다.
+	//me->SetActorLocation(landingLoc);	
+	
 }
 

@@ -53,14 +53,13 @@ public:
 	float damageDelayTime = 2;
 	//Die 진행되는 동안
 
-
 	//Boss HP 계산하기
 	float hp;
 	float maxHP = 100;
 
 	//Boss가 Player를 감지하는 거리 범위
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float attackRange = 600;
+	float attackRange = 300;
 
 	//플레이어와 Boss 사이의 거리
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
@@ -68,11 +67,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BossSettings")
 	float walkSpeed = 350.f;
-	
-
-
-
-
 
 	void IdleState();
 	void MoveState();
@@ -83,6 +77,7 @@ public:
 
 	UFUNCTION()
 	void OnDamageProcess(float attack);
+
 
 
 };

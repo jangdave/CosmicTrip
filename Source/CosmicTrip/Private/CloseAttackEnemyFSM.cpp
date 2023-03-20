@@ -224,6 +224,13 @@ void UCloseAttackEnemyFSM::OnTakeDamage(float damage)
 	if (maxHP > 0)
 	{
 		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Damage"));
+
+		//뒤로 밀리기 P = P0 + vt
+		FVector p0 = me->GetActorLocation();
+		float easing = 1 - pow(2, -8 * GetWorld()->GetDeltaSeconds());
+		FVector vect = me->GetActorForwardVector() * -1 * GetWorld()->GetDeltaSeconds() * 140000 * easing;
+		me->SetActorLocation(p0 + vect);
+
 	}
 	else if (maxHP <= 0 && bDeathAnimPlay != true)
 	{
@@ -232,12 +239,7 @@ void UCloseAttackEnemyFSM::OnTakeDamage(float damage)
 	}
 }
 
-//플레이어의 체력을 깎을 것이다
-void UCloseAttackEnemyFSM::OnHitEvent()
-{
-	//me->caEnemyFSM->bAttackPlay = false;
 
-}
 
 bool UCloseAttackEnemyFSM::UpdateRandomLocation(float radius, FVector& outLocation)
 {

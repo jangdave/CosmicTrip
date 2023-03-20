@@ -31,7 +31,7 @@ public:
 	float maxTime = 7;
 
 	//랜덤한 장소에서
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	TArray<class AActor*> spawnList;
 
 	int prevRandIndex = -1;

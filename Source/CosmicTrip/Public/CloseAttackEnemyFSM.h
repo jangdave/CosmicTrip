@@ -74,7 +74,6 @@ public:
 	//hp계산할것
 	void OnTakeDamage(float damage);
 
-	void OnHitEvent();
 
 	bool bAttackAnimPlay;
 
