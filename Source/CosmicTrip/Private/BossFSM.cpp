@@ -98,9 +98,10 @@ void UBossFSM::MoveState()
 		//플레이어의 위치를 찾는다, 이동한다
 		ai->MoveToLocation(mainTargetLoc);
 		
+		
 	}	
 	//플레이어와의 거리가 공격 범위 이하이면 공격 애니메이션을 실행하는 함수를 호출한다
-	if (attackRange >= mainTargetDist && bossAnim->bAttackPlay == true)
+	if (attackRange >= mainTargetDist && bossAnim->bAttackPlay == true && mainTargetDist - attackRange <= 0)
 	{				
 		state = EBossState::ATTACK;
 		bossAnim->animState = state;

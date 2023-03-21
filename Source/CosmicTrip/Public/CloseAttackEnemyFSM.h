@@ -44,7 +44,7 @@ public:
 	
 	//멈춰서 플레이어 공격할 범위
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float attackRange = 500;
+	float attackRange = 250;
 
 	//플레이어 추적 거리
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
@@ -62,8 +62,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Range")
 	float razerTargetDist;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float acceptanceRadius = 5;
+// 	UPROPERTY(EditDefaultsOnly, Category = "Range")
+// 	float acceptanceRadius = 5;
 
 	//시간체크
 	float currentTime = 0;

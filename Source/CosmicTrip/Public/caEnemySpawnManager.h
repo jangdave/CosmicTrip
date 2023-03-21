@@ -50,7 +50,7 @@ public:
 
 	//스폰할 적 갯수 제한
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	int limitedEnemyCount = 2;
+	int limitedEnemyCount = 15;
 
 	//함수 실행될 때마다 스폰되는 갯수 저장할 변수
 	int EnemyCount = 0;

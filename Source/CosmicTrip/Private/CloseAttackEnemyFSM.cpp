@@ -105,7 +105,7 @@ void UCloseAttackEnemyFSM::TickMove()
 	targetDist = me->GetDistanceTo(mainTarget);
 
 	//플레이어를 공격할 범위 안에 들어왔다면 플레이어 공격 상태로 전환
-	if (targetDist <= attackRange)
+	if (targetDist <= attackRange && targetDist - attackRange <= 0)
 	{
 // 		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));
 // 		me->caEnemyAnim->bChangeMove = false;
@@ -136,7 +136,7 @@ void UCloseAttackEnemyFSM::TickMoveToRobot()
 	ai->MoveToLocation(razerTarget->GetActorLocation());
 
 	//로봇을 공격할 범위 안에 들어왔다면 로봇 공격 상태로 전환
-	if (razerTargetDist <= attackRange)
+	if (razerTargetDist < attackRange)
 	{
 		SetState(EEnemyState::ATTACKROBOT);
 	}
@@ -195,7 +195,7 @@ void UCloseAttackEnemyFSM::TickAttackRobot()
 	//로봇과 나의 거리
 	razerTargetDist = razerTarget->GetDistanceTo(me);
 	//공격 범위를 벗어나면 move로 전환
-	if (razerTargetDist > attackRange)
+	if (razerTargetDist >= attackRange)
 	{
 		SetState(EEnemyState::MOVE);
 	}
