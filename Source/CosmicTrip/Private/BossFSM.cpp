@@ -131,7 +131,6 @@ void UBossFSM::AttackState()
 		bossAnim->animState = state;
 		//첫 공격에만 이 애니메이션을 재생하도록
 		bossAnim->bAttackPlay = false;
-
 	}	
 }
 

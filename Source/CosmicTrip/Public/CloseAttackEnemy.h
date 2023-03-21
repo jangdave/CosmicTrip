@@ -40,9 +40,22 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UCloseAttackEnemyAnim* caEnemyAnim;
 
+	UPROPERTY(VisibleAnyWhere, Category = "Sound")
+	class USoundBase* axeAttackSound;
+
 	//플레이어의 체력을 깎는다
 	UFUNCTION()
 	void OnOverlapEnemyEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	//적 스폰 niagara
+	UPROPERTY(EditDefaultsOnly, Category = "Enemy Spawn")
+	class UNiagaraSystem* spawnEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Enemy Spawn")
+	class UNiagaraComponent* spawnComp;
+
+	UFUNCTION()
+	void SpawnEffect();
 	
 
 };

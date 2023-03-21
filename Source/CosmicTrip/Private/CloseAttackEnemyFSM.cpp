@@ -11,6 +11,7 @@
 #include "RazerRobot.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+
 // Sets default values for this component's properties
 UCloseAttackEnemyFSM::UCloseAttackEnemyFSM()
 {
@@ -189,7 +190,7 @@ void UCloseAttackEnemyFSM::TickAttackRobot()
 		//공격 애니메이션
 		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));
 		currentTime = 0;
-
+		
 	}	
 	//로봇과 나의 거리
 	razerTargetDist = razerTarget->GetDistanceTo(me);
