@@ -7,6 +7,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "CosmicPlayer.h"
+#include <NiagaraFunctionLibrary.h>
+#include "NiagaraComponent.h"
 
 
 // Sets default values
@@ -51,6 +53,16 @@ ACloseAttackEnemy::ACloseAttackEnemy()
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("CloseAttackEnemyPreset"));
+
+	/*Sound*/
+	axeAttackSound = CreateDefaultSubobject<USoundBase>(TEXT("axeAttackSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> attackSound(TEXT("/Script/Engine.SoundWave'/Game/CosmicVR/Assets/Sound/AxeThrowSwing.AxeThrowSwing'"));
+	
+	if (attackSound.Succeeded())
+	{
+		axeAttackSound = attackSound.Object;
+	}
+	
 	
 }
 
@@ -64,6 +76,8 @@ void ACloseAttackEnemy::BeginPlay()
 
 	axeBox->SetGenerateOverlapEvents(true);
 	axeBox->OnComponentBeginOverlap.AddDynamic(this, &ACloseAttackEnemy::OnOverlapEnemyEvent);
+
+	SpawnEffect();
 	
 }
 
@@ -91,4 +105,23 @@ void ACloseAttackEnemy::OnOverlapEnemyEvent(UPrimitiveComponent* OverlappedCompo
 	}
 	UE_LOG(LogTemp, Warning, TEXT("UUUUUUUUUUUCloseAttackEnemyFSM::OnHitEvent Subtract Damage"))
 }
+
+void ACloseAttackEnemy::SpawnEffect()
+{
+	if (spawnEffect != nullptr)
+	{
+		spawnComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), spawnEffect, GetActorLocation() - FVector(0, 0, 90));
+		
+		FTimerHandle spawnTimer;
+		GetWorld()->GetTimerManager().SetTimer(spawnTimer, FTimerDelegate::CreateLambda(
+			[this]()->void
+			{
+				spawnComp->DestroyInstance();
+			}
+
+		), 4, false);
+	}
+
+}
+
 
