@@ -33,11 +33,18 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* movementComp;
 
-	
-
 	UFUNCTION() //언리얼에서 인식할수있는 형식
 	void OnDie();
 
 	UFUNCTION()
 	void BulletPower(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY()
+	class UNiagaraComponent* exploEffect;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* boomEffect;
+
+	UFUNCTION()
+	void StartBoom(FVector loc);
 };

@@ -48,6 +48,9 @@ public:
 	UPROPERTY()
 	class ABoss* boss;
 
+	UPROPERTY()
+	class ABulletActor* bullet;
+
 	void TickIdle();
 
 	void TickMove();

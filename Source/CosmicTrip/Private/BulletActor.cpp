@@ -9,6 +9,8 @@
 #include "CloseAttackEnemyFSM.h"
 #include "Boss.h"
 #include "BossFSM.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 // Sets default values
 ABulletActor::ABulletActor()
@@ -66,13 +68,25 @@ void ABulletActor::BulletPower(UPrimitiveComponent* OverlappedComponent, AActor*
 	if (enemy != nullptr)
 	{
 		enemy->caEnemyFSM->OnTakeDamage(10);
+		FVector loc = GetActorLocation();
+		StartBoom(loc);
 		Destroy();
 	}
 
 	if (boss != nullptr)
 	{
 		boss->bossFSM->OnDamageProcess(30);
+		FVector loc = GetActorLocation();
+		StartBoom(loc);
 		Destroy();
+	}
+}
+
+void ABulletActor::StartBoom(FVector loc)
+{
+	if (boomEffect)
+	{
+		exploEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), boomEffect, loc);
 	}
 }
 
