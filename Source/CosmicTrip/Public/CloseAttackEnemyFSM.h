@@ -62,8 +62,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Range")
 	float razerTargetDist;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float acceptanceRadius = 5;
+// 	UPROPERTY(EditDefaultsOnly, Category = "Range")
+// 	float acceptanceRadius = 5;
 
 	//시간체크
 	float currentTime = 0;
