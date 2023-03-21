@@ -15,9 +15,17 @@ class COSMICTRIP_API UPlayUserWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
+	
 	UFUNCTION(BlueprintImplementableEvent)
 	void CallBlood();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void CallEnd();
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float gameTimer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bPlayAnim;
 };

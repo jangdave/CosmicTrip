@@ -49,7 +49,7 @@ ABoss::ABoss()
 	weaponBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("weaponBox"));
 	weaponBox->SetupAttachment(weaponMesh);
 	weaponBox->SetRelativeLocationAndRotation(FVector(0, 299, 100), FRotator(0, 0, 90));
-	weaponBox->SetCapsuleSize(65, 525);
+	weaponBox->SetCapsuleSize(110, 700);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
@@ -99,7 +99,6 @@ void ABoss::OnHitBossEvent(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	if (player != nullptr)
 	{
 		player->OnPlayerDamage(10);
+		UE_LOG(LogTemp, Warning, TEXT("UBossFSM::OnHitEvent() Subtract Damage"))
 	}
-	UE_LOG(LogTemp, Warning, TEXT("UBossFSM::OnHitEvent() Subtract Damage"))
-
 }

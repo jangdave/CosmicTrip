@@ -97,13 +97,13 @@ void ACloseAttackEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 //플레이어의 체력을 깎을 것이다
 void ACloseAttackEnemy::OnOverlapEnemyEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("UUUUUUUUUUUCloseAttackEnemyFSM::OnHitEvent Subtract Damage"))
+	//UE_LOG(LogTemp, Warning, TEXT("UUUUUUUUUUUCloseAttackEnemyFSM::OnHitEvent Subtract Damage"))
 	auto player = Cast<ACosmicPlayer>(OtherActor);
 	if (player != nullptr)
 	{
 		player->OnPlayerDamage(4);
+		//UE_LOG(LogTemp, Warning, TEXT("UUUUUUUUUUUCloseAttackEnemyFSM::OnHitEvent Subtract Damage"))
 	}
-	UE_LOG(LogTemp, Warning, TEXT("UUUUUUUUUUUCloseAttackEnemyFSM::OnHitEvent Subtract Damage"))
 }
 
 void ACloseAttackEnemy::SpawnEffect()

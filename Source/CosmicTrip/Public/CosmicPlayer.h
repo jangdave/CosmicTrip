@@ -183,10 +183,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Widget")
 	class UWidgetComponent* leftWidget;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UPlayUserWidget> playUserWidget;
-
+	UPROPERTY()
 	class UPlayUserWidget* user_UI;
 
-	void Damage();
+	UPROPERTY()
+	class ULeftPlayWidget* leftUser_UI;
+
+	bool bFirst;
 };

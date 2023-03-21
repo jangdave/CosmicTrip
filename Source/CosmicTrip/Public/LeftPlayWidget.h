@@ -17,6 +17,8 @@ class COSMICTRIP_API ULeftPlayWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 hp;
 

@@ -45,8 +45,8 @@ public:
 	UPROPERTY()
 	class ACosmicPlayer* player;
 
-	UFUNCTION()
-	void Impact(FVector loc);
+	UPROPERTY()
+	FVector spawnLoc;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
 	class UNiagaraSystem* impactEffect;

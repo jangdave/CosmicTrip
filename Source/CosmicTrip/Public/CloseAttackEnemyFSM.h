@@ -44,7 +44,7 @@ public:
 	
 	//멈춰서 플레이어 공격할 범위
 	UPROPERTY(EditDefaultsOnly, Category = "Range")
-	float attackRange = 500;
+	float attackRange = 250;
 
 	//플레이어 추적 거리
 	UPROPERTY(EditDefaultsOnly, Category = "Range")

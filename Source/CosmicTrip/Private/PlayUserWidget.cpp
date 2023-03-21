@@ -3,3 +3,8 @@
 
 #include "PlayUserWidget.h"
 
+void UPlayUserWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+}
