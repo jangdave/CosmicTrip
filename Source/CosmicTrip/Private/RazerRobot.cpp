@@ -69,6 +69,15 @@ void ARazerRobot::StartFire()
 		{
 			auto target = Cast<ACloseAttackEnemy>(hitResult.GetActor());
 			target->caEnemyFSM->OnTakeDamage(10.0f);
+			Impact(hitResult.Location);
 		}
+	}
+}
+
+void ARazerRobot::Impact(FVector loc)
+{
+	if (impactEffect)
+	{
+		impactComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), impactEffect, loc);
 	}
 }

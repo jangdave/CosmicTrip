@@ -3,6 +3,7 @@
 
 #include "RazerFSMComponent.h"
 #include "Boss.h"
+#include "BulletActor.h"
 #include "CloseAttackEnemy.h"
 #include "CloseAttackEnemyFSM.h"
 #include "CosmicPlayer.h"
@@ -33,6 +34,8 @@ void URazerFSMComponent::BeginPlay()
 	player = Cast<ACosmicPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
+
+	bullet = Cast<ABulletActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ABulletActor::StaticClass()));
 
 	SetRazerState(ERazerState::IDLE);
 
@@ -125,6 +128,7 @@ void URazerFSMComponent::TickPatrol()
 	}
 	else
 	{
+		enemis.Reset();
 		me->GetCharacterMovement()->MaxFlySpeed = 300.0f;
 		SetRazerState(ERazerState::IDLE);
 	}
@@ -202,6 +206,7 @@ void URazerFSMComponent::OnOverlap()
 	params.AddIgnoredActor(me);
 	params.AddIgnoredActor(player);
 	params.AddIgnoredActor(boss);
+	params.AddIgnoredActor(bullet);
 	
 	bOverlapEnemy = GetWorld()->OverlapMultiByChannel(oversInfo, loc, rot, ECC_Visibility, FCollisionShape::MakeSphere(1000), params);
 
