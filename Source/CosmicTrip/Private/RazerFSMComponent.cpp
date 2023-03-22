@@ -7,7 +7,6 @@
 #include "CloseAttackEnemy.h"
 #include "CloseAttackEnemyFSM.h"
 #include "CosmicPlayer.h"
-#include "EditorCategoryUtils.h"
 #include "RazerRobot.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
