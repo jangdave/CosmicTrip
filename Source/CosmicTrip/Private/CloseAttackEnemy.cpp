@@ -76,6 +76,7 @@ void ACloseAttackEnemy::BeginPlay()
 
 	axeBox->SetGenerateOverlapEvents(true);
 	axeBox->OnComponentBeginOverlap.AddDynamic(this, &ACloseAttackEnemy::OnOverlapEnemyEvent);
+	axeBox->OnComponentEndOverlap.AddDynamic(this, &ACloseAttackEnemy::EndOverlapEnemyEvent);
 
 	SpawnEffect();
 	
@@ -104,6 +105,12 @@ void ACloseAttackEnemy::OnOverlapEnemyEvent(UPrimitiveComponent* OverlappedCompo
 		player->OnPlayerDamage(4);
 		//UE_LOG(LogTemp, Warning, TEXT("UUUUUUUUUUUCloseAttackEnemyFSM::OnHitEvent Subtract Damage"))
 	}
+}
+
+void ACloseAttackEnemy::EndOverlapEnemyEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	UE_LOG(LogTemp, Warning, TEXT("EndOverlapEndOverlapEndOverlapEndOverlapEndOverlapEndOverlapEndOverlap"))
+
 }
 
 void ACloseAttackEnemy::SpawnEffect()

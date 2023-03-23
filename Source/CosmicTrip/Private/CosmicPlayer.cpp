@@ -166,7 +166,7 @@ void ACosmicPlayer::Tick(float DeltaTime)
 
 	Grabbing();
 
-	UE_LOG(LogTemp, Warning, TEXT("AAAAAAAAAACosmicPlayer::OnPlayerDamage HP : %d"), leftUser_UI->hp)
+	//UE_LOG(LogTemp, Warning, TEXT("AAAAAAAAAACosmicPlayer::OnPlayerDamage HP : %d"), leftUser_UI->hp)
 	
 }
 
