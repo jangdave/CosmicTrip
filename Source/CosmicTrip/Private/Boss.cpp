@@ -63,6 +63,7 @@ void ABoss::BeginPlay()
 	Super::BeginPlay();
 	
 	weaponBox->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnHitBossEvent);
+	weaponBox->OnComponentEndOverlap.AddDynamic(this, &ABoss::EndBossEvent);
 }
 
 void ABoss::PostInitializeComponents()
@@ -101,4 +102,10 @@ void ABoss::OnHitBossEvent(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 		player->OnPlayerDamage(10);
 		UE_LOG(LogTemp, Warning, TEXT("UBossFSM::OnHitEvent() Subtract Damage"))
 	}
+}
+
+void ABoss::EndBossEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+
 }
