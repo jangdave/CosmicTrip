@@ -100,17 +100,17 @@ void ACloseAttackEnemy::OnOverlapEnemyEvent(UPrimitiveComponent* OverlappedCompo
 {
 	//UE_LOG(LogTemp, Warning, TEXT("UUUUUUUUUUUCloseAttackEnemyFSM::OnHitEvent Subtract Damage"))
 	auto player = Cast<ACosmicPlayer>(OtherActor);
-	if (player != nullptr)
+	if (player != nullptr && bISHit != false)
 	{
 		player->OnPlayerDamage(4);
-		//UE_LOG(LogTemp, Warning, TEXT("UUUUUUUUUUUCloseAttackEnemyFSM::OnHitEvent Subtract Damage"))
+		UE_LOG(LogTemp, Warning, TEXT("UUUUUUUUUUUCloseAttackEnemyFSM::OnHitEvent Subtract Damage"))
 	}
 }
 
 void ACloseAttackEnemy::EndOverlapEnemyEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("EndOverlapEndOverlapEndOverlapEndOverlapEndOverlapEndOverlapEndOverlap"))
-
+	//UE_LOG(LogTemp, Warning, TEXT("EndOverlapEndOverlapEndOverlapEndOverlapEndOverlapEndOverlapEndOverlap"))
+	bISHit = false;
 }
 
 void ACloseAttackEnemy::SpawnEffect()

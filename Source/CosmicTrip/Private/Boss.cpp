@@ -97,7 +97,7 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void ABoss::OnHitBossEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ACosmicPlayer* player = Cast<ACosmicPlayer>(OtherActor);
-	if (player != nullptr)
+	if (player != nullptr && bIsHit != false)
 	{
 		player->OnPlayerDamage(10);
 		UE_LOG(LogTemp, Warning, TEXT("UBossFSM::OnHitEvent() Subtract Damage"))
@@ -107,5 +107,5 @@ void ABoss::OnHitBossEvent(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 void ABoss::EndBossEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-
+	bIsHit = false;
 }

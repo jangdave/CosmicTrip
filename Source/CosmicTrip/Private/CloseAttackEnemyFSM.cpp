@@ -148,6 +148,7 @@ void UCloseAttackEnemyFSM::TickAttack()
 {
 	if (bAttackAnimPlay != true)
 	{
+		me->bISHit = true;
 		me->PlayAnimMontage(me->caEnemyAnim->enemyMontageFactory, 1, FName("Attack"));
 		me->caEnemyAnim->bChangeMove = false;
 		me->GetCharacterMovement()->MaxWalkSpeed = 0;

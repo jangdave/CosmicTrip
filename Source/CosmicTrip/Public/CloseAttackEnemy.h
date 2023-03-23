@@ -59,6 +59,8 @@ public:
 
 	UFUNCTION()
 	void SpawnEffect();
+
+	bool bISHit;
 	
 
 };

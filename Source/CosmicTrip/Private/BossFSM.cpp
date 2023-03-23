@@ -118,7 +118,8 @@ void UBossFSM::MoveState()
 
 void UBossFSM::AttackState()
 {		
-	//플레이어를 공격하는 애니메이션	
+	//플레이어를 공격하는 애니메이션
+	me->bIsHit = true;
 	me->GetCharacterMovement()->MaxWalkSpeed = 0;
 
 	// 1. 시간이 흘렀으니까
